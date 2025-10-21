@@ -7,7 +7,7 @@ const API = {
     create: 'users/create',
     update: 'users/update',
     delete: 'users/delete',
-    roles: 'users/roles'
+    roles: 'users/roles',
   }
 };
 
