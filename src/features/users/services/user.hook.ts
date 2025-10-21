@@ -12,3 +12,7 @@ export const usePostUser = () => {
 export const useGetUsersById = (id: string) => {
   return useFetchData({ url: `${API.users.list}/${id}` })
 }
+
+export const useUpdateUser = () => {
+  return usePostData({ url: API.users.update, refetchQueries: ['users'] })
+}
