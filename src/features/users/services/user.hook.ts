@@ -9,8 +9,8 @@ export const usePostUser = () => {
   return usePostData({ url: API.users.list, refetchQueries: ['users'] })
 }
 
-export const useGetUsersById = (id: string) => {
-  return useFetchData({ url: `${API.users.list}/${id}` })
+export const useGetUsersById = (userId: number) => {
+  return useFetchData({ url: `${API.users.list}/${userId}`, enabled: !!userId })
 }
 
 export const useUpdateUser = () => {

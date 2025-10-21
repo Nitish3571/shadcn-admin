@@ -118,6 +118,28 @@ export const columns: ColumnDef<UserListResponseTypes>[] = [
   },
 },
 
+{
+  accessorKey: 'user_type',
+  header: ({ column }) => (
+    <DataTableColumnHeader column={column} title="User Type" />
+  ),
+  cell: ({ row }) => {
+    const userType = userTypes.find(
+      ({ value }) => value == row.getValue('user_type')
+    );
+    return (
+      <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-x-1">
+              {userType?.icon && (
+                <userType.icon size={16} className="text-muted-foreground" />
+              )}
+              <span className="text-sm capitalize">{userType?.label}</span>
+            </div>
+      </div>
+    );
+  },
+},
+
   {
     accessorKey: 'Actions',
     id: 'actions',

@@ -1,8 +1,11 @@
 'use client'
 
 import { z } from 'zod'
+import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -33,10 +36,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+
+import { useUsers } from '../context/users-context'
+import { usePostUser, useUpdateUser, useGetUsersById } from '../services/user.hook'
 import { userTypes } from '../data/data'
-import { User } from '../data/schema'
-import { toast } from 'sonner'
-import { usePostUser, useUpdateUser } from '../services/user.hook'
 
 /* ------------------- Schema ------------------- */
 const formSchema = z
@@ -51,9 +54,9 @@ const formSchema = z
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     role: z.string().optional(),
     bio: z.string().optional(),
-    dateOfBirth: z.string().optional(),
+    date_of_birth: z.string().optional(),
     status: z.string().min(1, { message: 'Status is required.' }),
-    userType: z.string().min(1, { message: 'User Type is required.' }),
+    user_type: z.string().min(1, { message: 'User Type is required.' }),
     isEdit: z.boolean(),
   })
   .superRefine(({ isEdit, password, confirmPassword }, ctx) => {
@@ -65,7 +68,6 @@ const formSchema = z
           path: ['password'],
         })
       }
-
       if (password.length < 8) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -73,7 +75,6 @@ const formSchema = z
           path: ['password'],
         })
       }
-
       if (!password.match(/[a-z]/)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -81,7 +82,6 @@ const formSchema = z
           path: ['password'],
         })
       }
-
       if (!password.match(/\d/)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -89,7 +89,6 @@ const formSchema = z
           path: ['password'],
         })
       }
-
       if (password !== confirmPassword) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -103,86 +102,94 @@ const formSchema = z
 type UserForm = z.infer<typeof formSchema>
 
 /* ------------------- Component ------------------- */
-interface Props {
-  currentRow?: User
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
+export function UsersActionDialog() {
+  const { open, setOpen, currentRow } = useUsers()
+  const isEdit = open === 'edit'
 
-export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
-  const isEdit = !!currentRow
+    // Fetch data when editing
+  const userId = currentRow?.id
+  const { data: userData, isLoading } = useGetUsersById(userId!, { enabled: !!userId && isEdit })
 
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
-    defaultValues: isEdit
-      ? {
-          name: currentRow?.name || '',
-          email: currentRow?.email || '',
-          phone: currentRow?.phone || '',
-          password: '',
-          confirmPassword: '',
-          role: currentRow?.role || '',
-          bio: currentRow?.bio || '',
-          dateOfBirth: currentRow?.dateOfBirth || '',
-          status: String(currentRow?.status || 1),
-          userType: String(currentRow?.userType || 1),
-          isEdit,
-        }
-      : {
-          name: '',
-          email: '',
-          phone: '',
-          password: '',
-          confirmPassword: '',
-          role: '',
-          bio: '',
-          dateOfBirth: '',
-          status: '1',
-          userType: '1',
-          isEdit,
-        },
+    defaultValues: {
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: '',
+      role: '',
+      bio: '',
+      date_of_birth: '',
+      status: '1',
+      user_type: '1',
+      isEdit,
+    },
   })
 
   const { mutate: createUser, isPending: creating } = usePostUser()
-  const { mutate: updateUser, isPending: updating } = useUpdateUser()
 
-  const onSubmit = (values: UserForm) => {
-    if (isEdit && currentRow) {
-      updateUser(
-        { id: currentRow.id, ...values },
-        {
-          onSuccess: () => {
-            toast.success('User updated successfully!')
-            form.reset()
-            onOpenChange(false)
-          },
-          onError: (error: any) => {
-            toast.error(error?.message || 'Failed to update user')
-          },
-        }
-      )
-    } else {
-      createUser(values, {
-        onSuccess: () => {
-          toast.success('User created successfully!')
-          form.reset()
-          onOpenChange(false)
-        },
-        onError: (error: any) => {
-          toast.error(error?.message || 'Failed to create user')
-        },
+  // 🔹 When user data is fetched, update form
+  useEffect(() => {
+    if (userData && isEdit) {
+
+      const res = userData?.data;
+      
+      form.reset({
+        name: res.name || '',
+        email: res.email || '',
+        phone: res.phone || '',
+        role: res.role || '',
+        bio: res.bio || '',
+        date_of_birth: new Date(res.date_of_birth).toLocaleDateString() || '',
+        status: String(res.status || '1'),
+        user_type: String(res.user_type || '1'),
+        password: '',
+        confirmPassword: '',
+        isEdit: true,
       })
     }
+  }, [userData, isEdit, form])
+
+  const onSubmit = (values: UserForm) => {
+    // if (isEdit && currentRow) {
+    const userId = currentRow?.id ?? null;
+      createUser(
+        { id: userId, ...values },
+        {
+          onSuccess: (res) => {
+            console.log("res", res);
+            
+            toast.success('User updated successfully!')
+            form.reset()
+            setOpen(null)
+          },
+          onError: (error: any) =>
+            toast.error(error?.message || 'Failed to update user'),
+        }
+      )
   }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
 
+  if (isEdit && isLoading) {
+    return (
+      <Dialog open={true} onOpenChange={() => setOpen(null)}>
+        <DialogContent className="sm:max-w-lg flex justify-center items-center h-40">
+          <p>Loading user data...</p>
+        </DialogContent>
+      </Dialog>
+    )
+  }
+
   return (
     <Dialog
-      open={open}
+      open={open === 'add' || open === 'edit'}
       onOpenChange={(state) => {
-        form.reset()
-        onOpenChange(state)
+        if (!state) {
+          form.reset()
+          setOpen(null)
+        }
       }}
     >
       <DialogContent className="sm:max-w-lg">
@@ -202,6 +209,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               onSubmit={form.handleSubmit(onSubmit)}
               className="space-y-4 p-0.5"
             >
+              {/* All form fields remain the same */}
               {/* Name */}
               <FormField
                 control={form.control}
@@ -248,9 +256,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 name="phone"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                    <FormLabel className="col-span-2 text-right">
-                      Phone
-                    </FormLabel>
+                    <FormLabel className="col-span-2 text-right">Phone</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="+91 9876543210"
@@ -266,12 +272,12 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               {/* User Type */}
               <FormField
                 control={form.control}
-                name="userType"
+                name="user_type"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
                     <FormLabel className="col-span-2 text-right">User Type</FormLabel>
                     <SelectDropdown
-                      defaultValue={field.value}
+                    defaultValue={field.value || (isEdit && currentRow?.user_type)}
                       onValueChange={field.onChange}
                       placeholder="Select a user type"
                       className="col-span-4"
@@ -329,12 +335,10 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               {/* Date of Birth */}
               <FormField
                 control={form.control}
-                name="dateOfBirth"
+                name="date_of_birth"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
-                    <FormLabel className="col-span-2 text-right">
-                      Date of Birth
-                    </FormLabel>
+                    <FormLabel className="col-span-2 text-right">Date of Birth</FormLabel>
                     <FormControl>
                       <Input type="date" className="col-span-4" {...field} />
                     </FormControl>
@@ -367,12 +371,13 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 control={form.control}
                 name="status"
                 render={({ field }) => (
+                  
                   <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
                     <FormLabel className="col-span-2 text-right">Status</FormLabel>
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        defaultValue={field.value || (isEdit && currentRow.status)}
                       >
                         <SelectTrigger className="col-span-4">
                           <SelectValue placeholder="Select status" />
@@ -391,13 +396,8 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                 )}
               />
 
-              <Button
-                type="submit"
-                form="user-form"
-                disabled={creating || updating}
-                className="w-full"
-              >
-                {creating || updating
+              <Button type="submit" className="w-full" disabled={creating}>
+                {creating
                   ? isEdit
                     ? 'Updating...'
                     : 'Creating...'
