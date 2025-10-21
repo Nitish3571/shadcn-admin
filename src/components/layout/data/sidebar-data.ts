@@ -11,12 +11,16 @@ import {
 } from '@tabler/icons-react'
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
+import { getItem } from '@/utils/storage'
+const userInfo = getItem('auth-storage')
+
+const userData = userInfo?.state?.userInfo;
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
-    avatar: '/avatars/shadcn.jpg',
+    name: userData?.name || 'Rana Jee',
+    email: userData?.email || 'rjee@gmail.com',
+    avatar: userData?.avatar || '/avatars/shadcn.jpg',
   },
   teams: [
     {

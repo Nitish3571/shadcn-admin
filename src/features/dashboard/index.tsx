@@ -15,7 +15,7 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
-
+import { sidebarData } from '@/components/layout/data/sidebar-data'
 export default function Dashboard() {
   return (
     <>
@@ -25,7 +25,7 @@ export default function Dashboard() {
         <div className='ml-auto flex items-center space-x-4'>
           <Search />
           <ThemeSwitch />
-          <ProfileDropdown />
+          <ProfileDropdown user={sidebarData.user} />
         </div>
       </Header>
 

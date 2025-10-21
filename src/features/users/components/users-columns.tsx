@@ -76,7 +76,7 @@ export const columns: ColumnDef<UserListResponseTypes>[] = [
       return (
         <div className='flex space-x-2'>
           <Badge variant='outline' className={cn('capitalize', badgeColor)}>
-            {row.getValue('status')=== 1 ? 'active' : row.getValue('status')=== 0 ? 'inactive' : row.getValue('status')=== 3 ? 'invited' : 'suspended'}
+            {row.getValue('status')== 1 ? 'active' : row.getValue('status')== 2 ? 'inactive' : row.getValue('status')== 3 ? 'invited' : 'suspended'}
           </Badge>
         </div>
       )
@@ -119,7 +119,10 @@ export const columns: ColumnDef<UserListResponseTypes>[] = [
 },
 
   {
+    accessorKey: 'Actions',
     id: 'actions',
     cell: DataTableRowActions,
+    enableHiding: false,
+    enableSorting: false,
   },
 ]

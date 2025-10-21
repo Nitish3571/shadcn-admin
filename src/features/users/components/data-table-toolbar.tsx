@@ -21,10 +21,10 @@ export function DataTableToolbar<TData>({
         <Input
           placeholder='Filter users...'
           value={
-            (table.getColumn('username')?.getFilterValue() as string) ?? ''
+            (table.getColumn('name')?.getFilterValue() as string) ?? ''
           }
           onChange={(event) =>
-            table.getColumn('username')?.setFilterValue(event.target.value)
+            table.getColumn('name')?.setFilterValue(event.target.value)
           }
           className='h-8 w-[150px] lg:w-[250px]'
         />
@@ -34,10 +34,10 @@ export function DataTableToolbar<TData>({
               column={table.getColumn('status')}
               title='Status'
               options={[
-                { label: 'Active', value: 'active' },
-                { label: 'Inactive', value: 'inactive' },
-                { label: 'Invited', value: 'invited' },
-                { label: 'Suspended', value: 'suspended' },
+                { label: 'Active', value: '1' },
+                { label: 'Inactive', value: '2' },
+                { label: 'Invited', value: '3' },
+                { label: 'Suspended', value: '4' },
               ]}
             />
           )}

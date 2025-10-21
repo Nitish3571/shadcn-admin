@@ -13,7 +13,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '@/stores/authStore'
 
-export function ProfileDropdown() {
+export function ProfileDropdown({
+  user,
+}: {
+  user: {
+    name: string
+    email: string
+    avatar: string
+  }
+}) {
   const navigate=useNavigate()
   const { logout } = useAuthStore()
   const handleLogout = () => {
@@ -23,22 +31,28 @@ export function ProfileDropdown() {
       replace: true,
     })
   }
+
+  console.log("user: ", user);
+  
+  
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
           <Avatar className='h-8 w-8'>
             <AvatarImage src='/avatars/01.png' alt='@shadcn' />
-            <AvatarFallback>SN</AvatarFallback>
+            <AvatarFallback>
+              {user.name.split(' ').slice(0, 2).map(word => word.slice(0, 1)).join('')}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56' align='end' forceMount>
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm leading-none font-medium'>satnaing</p>
+            <p className='text-sm leading-none font-medium'>{user.name}</p>
             <p className='text-muted-foreground text-xs leading-none'>
-              satnaingdev@gmail.com
+              { user.email}
             </p>
           </div>
         </DropdownMenuLabel>

@@ -11,6 +11,7 @@ import UsersProvider from './context/users-context'
 import { userListSchema } from './data/schema'
 import { users } from './data/users'
 import { useGetUsers } from './services/user.hook'
+import { sidebarData } from '@/components/layout/data/sidebar-data'
 
 export default function Users() {
   // Parse user list
@@ -26,7 +27,7 @@ export default function Users() {
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
           <ThemeSwitch />
-          <ProfileDropdown />
+           <ProfileDropdown user={sidebarData.user} />
         </div>
       </Header>
 
