@@ -32,9 +32,6 @@ export function ProfileDropdown({
     })
   }
 
-  console.log("user: ", user);
-  
-  
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
