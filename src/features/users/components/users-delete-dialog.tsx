@@ -24,8 +24,6 @@ export function UsersDeleteDialog({ open, onOpenChange, currentRow }: Props) {
 
   const handleDelete = () => {
     if (value.trim() !== currentRow.name) return
-
-    console.log('userId', currentRow.id);
     const userId = currentRow.id;
 
     deleteUser(

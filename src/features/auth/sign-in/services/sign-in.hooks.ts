@@ -15,9 +15,6 @@ export const useLogin = () => {
     url: API.auth.login,
     mutationOptions: {
       onSuccess: (data:LoginData) => {
-        console.log("login data: ", data);
-        console.log("login token: ", data.token);
-        
        setUserInfo(data?.user)
         setToken(data?.token)
         navigate({

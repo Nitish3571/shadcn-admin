@@ -162,7 +162,6 @@ export function UsersActionDialog() {
         isEdit: true,
       })
     } else if (open === 'add') {
-      console.log('add');
       form.reset({
         name: '',
         email: '',
@@ -185,9 +184,7 @@ export function UsersActionDialog() {
       createUser(
         { id: userId, ...values },
         {
-          onSuccess: (res) => {
-            console.log("res", res);
-            
+          onSuccess: () => {
             toast.success(isEdit ? 'User updated successfully!' : 'User created successfully!')
             setOpen(null) 
             form.reset() 
