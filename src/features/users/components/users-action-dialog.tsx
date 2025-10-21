@@ -26,16 +26,13 @@ import { PasswordInput } from '@/components/password-input'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
 import { User } from '../data/schema'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-import { usePostUser } from '../services/user.hook'
-import { toast } from 'sonner'
 
 const formSchema = z
   .object({
-    name: z.string().min(1, { message: 'Name is required.' }),
-    phone: z.string().min(1, { message: 'Phone number is required.' }),
+    firstName: z.string().min(1, { message: 'First Name is required.' }),
+    lastName: z.string().min(1, { message: 'Last Name is required.' }),
+    username: z.string().min(1, { message: 'Username is required.' }),
+    phoneNumber: z.string().min(1, { message: 'Phone number is required.' }),
     email: z
       .string()
       .min(1, { message: 'Email is required.' })
@@ -44,10 +41,6 @@ const formSchema = z
     role: z.string().min(1, { message: 'Role is required.' }),
     confirmPassword: z.string().transform((pwd) => pwd.trim()),
     isEdit: z.boolean(),
-    bio: z.string().optional(),
-    dateOfBirth: z.string().optional(),
-    status: z.number(),
-    userType: z.number(),
   })
   .superRefine(({ isEdit, password, confirmPassword }, ctx) => {
     if (!isEdit || (isEdit && password !== '')) {
@@ -112,36 +105,23 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
           isEdit,
         }
       : {
-          name: '',
+          firstName: '',
+          lastName: '',
+          username: '',
           email: '',
           role: '',
-          phone: '',
+          phoneNumber: '',
           password: '',
           confirmPassword: '',
           isEdit,
-          bio: '',
-          dateOfBirth: '',
-          status: 1,
-          userType: 1,
         },
   })
 
-   const { mutate: createUser, isPending } = usePostUser();
-
-   const onSubmit = (values: UserForm) => {
-    createUser(values, {
-      onSuccess: () => {
-        toast.success('User created successfully!');
-        form.reset(); 
-        onOpenChange(false)
-      },
-      onError: (error: any) => {
-        console.log("error: ", error);
-        
-        toast.error(error?.message || 'Failed to create user');
-      },
-    });
-  };
+  const onSubmit = (values: UserForm) => {
+    form.reset()
+    showSubmittedData(values)
+    onOpenChange(false)
+  }
 
   const isPasswordTouched = !!form.formState.dirtyFields.password
 
@@ -170,17 +150,56 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
             >
               <FormField
                 control={form.control}
-                name='name'
+                name='firstName'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
-                      Name
+                      First Name
                     </FormLabel>
                     <FormControl>
                       <Input
                         placeholder='John'
                         className='col-span-4'
                         autoComplete='off'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='lastName'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                    <FormLabel className='col-span-2 text-right'>
+                      Last Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Doe'
+                        className='col-span-4'
+                        autoComplete='off'
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage className='col-span-4 col-start-3' />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name='username'
+                render={({ field }) => (
+                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
+                    <FormLabel className='col-span-2 text-right'>
+                      Username
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='john_doe'
+                        className='col-span-4'
                         {...field}
                       />
                     </FormControl>
@@ -198,9 +217,8 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder='example@gmail.com'
+                        placeholder='john.doe@gmail.com'
                         className='col-span-4'
-                        autoComplete='off'
                         {...field}
                       />
                     </FormControl>
@@ -210,7 +228,7 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               />
               <FormField
                 control={form.control}
-                name='phone'
+                name='phoneNumber'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
@@ -229,16 +247,16 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
               />
               <FormField
                 control={form.control}
-                name='user_type'
+                name='role'
                 render={({ field }) => (
                   <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
                     <FormLabel className='col-span-2 text-right'>
-                      User Type
+                      Role
                     </FormLabel>
                     <SelectDropdown
                       defaultValue={field.value}
                       onValueChange={field.onChange}
-                      placeholder='Select a user type'
+                      placeholder='Select a role'
                       className='col-span-4'
                       items={userTypes.map(({ label, value }) => ({
                         label,
@@ -288,82 +306,13 @@ export function UsersActionDialog({ currentRow, open, onOpenChange }: Props) {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name='dateOfBirth'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Date of Birth
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='YYYY-MM-DD'
-                        type='date'
-                        className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='bio'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Bio
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder='Write something about yourself'
-                        className='col-span-4'
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name='status'
-                render={({ field }) => (
-                  <FormItem className='grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1'>
-                    <FormLabel className='col-span-2 text-right'>
-                      Status
-                    </FormLabel>
-                    <Select>
-                      <FormControl>
-                        <SelectTrigger className='w-[180px]'>
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                      <SelectGroup>
-                        <SelectLabel>Select status</SelectLabel>
-                        <SelectItem value="1">Active</SelectItem>
-                        <SelectItem value="2">Inactive</SelectItem>
-                      </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage className='col-span-4 col-start-3' />
-                  </FormItem>
-                )}
-              />
             </form>
           </Form>
         </div>
         <DialogFooter>
-          <Button type='submit' form='user-form' disabled={isPending}>
-            {isPending ? 'Creating...' : 'Create User'}
+          <Button type='submit' form='user-form'>
+            Save changes
           </Button>
-
-          {/* <button type="submit" disabled={isPending}>
-        {isPending ? 'Creating...' : 'Create User'}
-      </button> */}
         </DialogFooter>
       </DialogContent>
     </Dialog>
