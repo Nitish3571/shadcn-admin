@@ -11,7 +11,7 @@ export const users = Array.from({ length: 20 }, () => {
       .username({ firstName, lastName })
       .toLocaleLowerCase(),
     email: faker.internet.email({ firstName }).toLocaleLowerCase(),
-    phone: faker.phone.number({ style: 'international' }),
+    phoneNumber: faker.phone.number({ style: 'international' }),
     status: faker.helpers.arrayElement([
       'active',
       'inactive',
