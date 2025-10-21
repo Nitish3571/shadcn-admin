@@ -31,7 +31,7 @@ const usePostData = <TData = unknown, TVariables = unknown>({
 
 
   return useMutation<TData, Error, TVariables>({
-    mutationFn: async (variables: TVariables) => {
+    mutationFn: async (variables: TVariables): Promise<TData> => {
       const response = await instance.post<ApiResponse<TData>>({
         url,
         data: variables,
@@ -40,7 +40,7 @@ const usePostData = <TData = unknown, TVariables = unknown>({
       
       if (response?.statusCode === 200 || response?.statusCode === 201) {
         toast(response?.message || 'Data posted successfully');
-        return response.data; // Extracting only the data field
+        return response.data as TData; 
       }
 
       if (response?.statusCode === 400||response?.statusCode === 422) {
