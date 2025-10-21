@@ -38,7 +38,8 @@ import {
 } from '@/components/ui/select'
 
 import { useUsers } from '../context/users-context'
-import { usePostUser, useUpdateUser, useGetUsersById } from '../services/user.hook'
+// Assuming you are using tanstack/react-query or a similar data fetching library
+import { usePostUser, useGetUsersById } from '../services/user.hook' 
 import { userTypes } from '../data/data'
 
 /* ------------------- Schema ------------------- */
@@ -60,13 +61,15 @@ const formSchema = z
     isEdit: z.boolean(),
   })
   .superRefine(({ isEdit, password, confirmPassword }, ctx) => {
-    if (!isEdit || (isEdit && password !== '')) {
+    // 💡 Only run full password validation if NOT in edit mode OR if a new password was entered
+    if (!isEdit || (isEdit && password !== '')) { 
       if (password === '') {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Password is required.',
           path: ['password'],
         })
+        return; // Stop further password checks if empty and required
       }
       if (password.length < 8) {
         ctx.addIssue({
@@ -101,14 +104,24 @@ const formSchema = z
 
 type UserForm = z.infer<typeof formSchema>
 
+const formatDateForInput = (dateString: string | undefined): string => {
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
+  } catch (error) {
+    return '';
+  }
+};
+
 /* ------------------- Component ------------------- */
 export function UsersActionDialog() {
   const { open, setOpen, currentRow } = useUsers()
   const isEdit = open === 'edit'
 
-    // Fetch data when editing
   const userId = currentRow?.id
-  const { data: userData, isLoading } = useGetUsersById(userId!, { enabled: !!userId && isEdit })
+  const { data: userData, isLoading } = useGetUsersById(userId!, { enabled: !!userId && isEdit }) 
 
   const form = useForm<UserForm>({
     resolver: zodResolver(formSchema),
@@ -131,9 +144,9 @@ export function UsersActionDialog() {
 
   // 🔹 When user data is fetched, update form
   useEffect(() => {
+    // Ensure form.setValue only runs after data is available AND we are in edit mode
     if (userData && isEdit) {
-
-      const res = userData?.data;
+      const res = userData?.data
       
       form.reset({
         name: res.name || '',
@@ -141,31 +154,46 @@ export function UsersActionDialog() {
         phone: res.phone || '',
         role: res.role || '',
         bio: res.bio || '',
-        date_of_birth: new Date(res.date_of_birth).toLocaleDateString() || '',
+        date_of_birth: formatDateForInput(res.date_of_birth), 
         status: String(res.status || '1'),
-        user_type: String(res.user_type || '1'),
+        user_type: String(res.user_type || '3'),
         password: '',
         confirmPassword: '',
         isEdit: true,
       })
+    } else if (open === 'add') {
+      console.log('add');
+      form.reset({
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        confirmPassword: '',
+        role: '',
+        bio: '',
+        date_of_birth: '',
+        status: '1',
+        user_type: '3',
+        isEdit: false, 
+      });
     }
-  }, [userData, isEdit, form])
+  }, [userData, isEdit, form, open])
 
   const onSubmit = (values: UserForm) => {
-    // if (isEdit && currentRow) {
     const userId = currentRow?.id ?? null;
+
       createUser(
         { id: userId, ...values },
         {
           onSuccess: (res) => {
             console.log("res", res);
             
-            toast.success('User updated successfully!')
-            form.reset()
-            setOpen(null)
+            toast.success(isEdit ? 'User updated successfully!' : 'User created successfully!')
+            setOpen(null) 
+            form.reset() 
           },
           onError: (error: any) =>
-            toast.error(error?.message || 'Failed to update user'),
+            toast.error(error?.message || (isEdit ? 'Failed to update user' : 'Failed to create user')),
         }
       )
   }
@@ -187,7 +215,7 @@ export function UsersActionDialog() {
       open={open === 'add' || open === 'edit'}
       onOpenChange={(state) => {
         if (!state) {
-          form.reset()
+          form.reset() 
           setOpen(null)
         }
       }}
@@ -277,7 +305,7 @@ export function UsersActionDialog() {
                   <FormItem className="grid grid-cols-6 items-center space-y-0 gap-x-4 gap-y-1">
                     <FormLabel className="col-span-2 text-right">User Type</FormLabel>
                     <SelectDropdown
-                    defaultValue={field.value || (isEdit && currentRow?.user_type)}
+                      defaultValue={field.value}
                       onValueChange={field.onChange}
                       placeholder="Select a user type"
                       className="col-span-4"
@@ -300,7 +328,7 @@ export function UsersActionDialog() {
                     <FormLabel className="col-span-2 text-right">Password</FormLabel>
                     <FormControl>
                       <PasswordInput
-                        placeholder="e.g., S3cur3P@ssw0rd"
+                        placeholder={isEdit ? 'Leave blank to keep existing' : 'e.g., S3cur3P@ssw0rd'}
                         className="col-span-4"
                         {...field}
                       />
@@ -321,7 +349,8 @@ export function UsersActionDialog() {
                     </FormLabel>
                     <FormControl>
                       <PasswordInput
-                        disabled={!isPasswordTouched}
+                        // Disabled only if in edit mode and password field is not touched
+                        disabled={isEdit && !isPasswordTouched} 
                         placeholder="Confirm password"
                         className="col-span-4"
                         {...field}
@@ -377,7 +406,8 @@ export function UsersActionDialog() {
                     <FormControl>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value || (isEdit && currentRow.status)}
+                        // Use field.value for controlled component logic
+                        defaultValue={field.value} 
                       >
                         <SelectTrigger className="col-span-4">
                           <SelectValue placeholder="Select status" />

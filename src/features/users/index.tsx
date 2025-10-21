@@ -8,14 +8,12 @@ import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
 import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
-import { userListSchema } from './data/schema'
-import { users } from './data/users'
 import { useGetUsers } from './services/user.hook'
 import { sidebarData } from '@/components/layout/data/sidebar-data'
 
 export default function Users() {
   // Parse user list
-  const userList = userListSchema.parse(users)
+  // const userList = userListSchema.parse(users)
 
   const { data: listData, isLoading: loading, error }:any = useGetUsers()
   if (loading) return <div>Loading...</div>

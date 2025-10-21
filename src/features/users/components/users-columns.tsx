@@ -11,6 +11,7 @@ import { DataTableRowActions } from './data-table-row-actions'
 export const columns: ColumnDef<UserListResponseTypes>[] = [
   {
     id: 'select',
+    accessorKey: 'id',
     header: ({ table }) => (
       <Checkbox
         checked={
@@ -66,6 +67,27 @@ export const columns: ColumnDef<UserListResponseTypes>[] = [
     ),
   },
   {
+  accessorKey: 'user_type',
+  header: ({ column }) => (
+    <DataTableColumnHeader column={column} title="User Type" />
+  ),
+  cell: ({ row }) => {
+    const userType = userTypes.find(
+      ({ value }) => value == row.getValue('user_type')
+    );
+    return (
+      <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-x-1">
+              {userType?.icon && (
+                <userType.icon size={16} className="text-muted-foreground" />
+              )}
+              <span className="text-sm capitalize">{userType?.label}</span>
+            </div>
+      </div>
+    );
+  },
+},
+  {
     accessorKey: 'status',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Status' />
@@ -87,58 +109,8 @@ export const columns: ColumnDef<UserListResponseTypes>[] = [
     enableHiding: false,
     enableSorting: false,
   },
- {
-  accessorKey: 'roles',
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title="Role" />
-  ),
-  cell: ({ row }) => {
-    const roles = row.original.roles;
 
-    if (!roles || roles.length === 0) return null;
 
-    return (
-      <div className="flex flex-wrap items-center gap-2">
-        {roles.map((role, index) => {
-          const userType = userTypes.find(
-            ({ value }) => value.toLowerCase() === role.name.toLowerCase()
-          );
-
-          return (
-            <div key={index} className="flex items-center gap-x-1">
-              {userType?.icon && (
-                <userType.icon size={16} className="text-muted-foreground" />
-              )}
-              <span className="text-sm capitalize">{role.name}</span>
-            </div>
-          );
-        })}
-      </div>
-    );
-  },
-},
-
-{
-  accessorKey: 'user_type',
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title="User Type" />
-  ),
-  cell: ({ row }) => {
-    const userType = userTypes.find(
-      ({ value }) => value == row.getValue('user_type')
-    );
-    return (
-      <div className="flex flex-wrap items-center gap-2">
-            <div className="flex items-center gap-x-1">
-              {userType?.icon && (
-                <userType.icon size={16} className="text-muted-foreground" />
-              )}
-              <span className="text-sm capitalize">{userType?.label}</span>
-            </div>
-      </div>
-    );
-  },
-},
 
   {
     accessorKey: 'Actions',
