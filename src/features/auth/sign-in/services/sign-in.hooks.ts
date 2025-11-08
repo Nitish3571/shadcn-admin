@@ -4,23 +4,27 @@ import { useAuthStore, User } from '@/stores/authStore'
 import { useNavigate } from '@tanstack/react-router'
 
 interface LoginData {
-  user:User
-  token:string
+  user: User
+  token: string
 }
 
 export const useLogin = () => {
   const navigate = useNavigate()
-  const {setUserInfo,setToken}=useAuthStore()
+  const { setUserInfo, setToken } = useAuthStore()
   return usePostData({
     url: API.auth.login,
     mutationOptions: {
-      onSuccess: (data:LoginData) => {
-       setUserInfo(data?.user)
-        setToken(data?.token)
-        navigate({
-          to: '/',
-          replace: true,
-        })
+      onSuccess: (data: LoginData) => {
+        console.log("data", data);
+        if (!data?.token) return;
+        if (data?.user) {
+          setUserInfo(data?.user)
+          setToken(data?.token)
+          navigate({
+            to: '/',
+            replace: true,
+          })
+        }
       },
     },
   })

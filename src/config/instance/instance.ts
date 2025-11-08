@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/stores/authStore';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
@@ -6,7 +7,7 @@ import axios, {
 } from 'axios';
 import Cookies from 'js-cookie';
 
-const token = Cookies.get('token') || '';
+// const token = Cookies.get('token') || '';
 
 const axiosInstance = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/v1/',
@@ -25,6 +26,7 @@ interface ApiResponse<T> {
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    const token=useAuthStore.getState().token;
     config.headers.Authorization = `Bearer ${token}`;
     if (config.data instanceof FormData) {
       config.headers['Content-Type'] = 'multipart/form-data';
