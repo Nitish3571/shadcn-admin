@@ -39,7 +39,7 @@ import {
 
 import { useUsers } from '../context/users-context'
 // Assuming you are using tanstack/react-query or a similar data fetching library
-import { usePostUser, useGetUsersById } from '../services/user.hook' 
+import { usePostUser, useGetUsersById } from '../services/users.services' 
 import { userTypes } from '../data/data'
 
 /* ------------------- Schema ------------------- */

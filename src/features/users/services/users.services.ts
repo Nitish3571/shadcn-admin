@@ -2,12 +2,19 @@ import API from '@/config/api/api'
 import useDeleteData from '@/hooks/useDeleteData'
 import useFetchData from '@/hooks/useFetchData'
 import usePostData from '@/hooks/usePostData'
+import { useUserStore } from '../store/user-store'
 
 export const useGetUsers = (params:any) => {
   return useFetchData({ url: API.users.list, params })
 }
 export const usePostUser = () => {
-  return usePostData({ url: API.users.list, refetchQueries: [API.users.list] })
+  const { setOpen } = useUserStore();
+  return usePostData({ url: API.users.list,
+     refetchQueries: [API.users.list],
+      onSuccess: () => {
+        setOpen(null);
+      } 
+     })
 }
 
 export const useGetUsersById = (userId: number) => {
@@ -16,5 +23,13 @@ export const useGetUsersById = (userId: number) => {
 
 export const useDeleteUser = (userId: number) => {
   console.log("hooks user", userId);
-  return useDeleteData({ url: `${API.users.list}/${userId}`, refetchQueries: ['users'] })
+  const { setOpen } = useUserStore();
+  return useDeleteData({ url: `${API.users.list}/${userId}`,
+     refetchQueries: ['users'],
+     onSuccess: () => {
+      setOpen(null);
+      console.log("User deleted successfully");
+     }
+     })
+    
 }

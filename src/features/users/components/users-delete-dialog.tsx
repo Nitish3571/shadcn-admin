@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { User } from '../data/schema'
 import { toast } from 'sonner'
-import { useDeleteUser } from '../services/user.hook'
+import { useDeleteUser } from '../services/users.services'
 
 interface Props {
   open: boolean
