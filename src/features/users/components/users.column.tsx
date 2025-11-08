@@ -64,10 +64,10 @@ export const userColumns: ColumnDef<User>[] = [
     },
   },
   {
-    accessorKey: "phone_number",
+    accessorKey: "phone",
     header: "Contact",
     cell: ({ row }) => (
-      <span className="text-gray-700">{row.original.phone_number || '—'}</span>
+      <span className="text-gray-700">{row.original.phone || '—'}</span>
     ),
   },
   {

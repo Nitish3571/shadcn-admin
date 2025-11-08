@@ -30,7 +30,8 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { createUserSchema, TUserSchema } from "../schema/user-schema";
-import { useGetRole } from "@/features/roles/services/role.hook";
+import { useGetRoles } from "../services/users.services";
+
 
 
 interface Props {
@@ -52,7 +53,7 @@ export function UserActionForm({
 }: Readonly<Props>) {
   const isEdit = !!currentRow && !isViewMode;
 
-  const { data: rolesData, isLoading: isRolesLoading } :any= useGetRole();
+  const { data: rolesData, isLoading: isRolesLoading } :any= useGetRoles();
 
 
   // Create a memoized schema that depends on rolesData
@@ -61,14 +62,14 @@ export function UserActionForm({
   const form = useForm<TUserSchema>({
     resolver: zodResolver(userSchema as any),
     defaultValues: {
-      name: "", email: "", phone_number: "", password: "",
+      name: "", email: "", phone: "", password: "",
       role_id: undefined, barge_id: undefined, crane_id: undefined,
     },
   });
 
   // Watch the 'role_id' field to conditionally render other fields
   const selectedRoleId = form.watch("role_id");
-  const selectedRole = rolesData?.find((role:any) => role.id === selectedRoleId);
+  const selectedRole = rolesData?.data?.find((role:any) => role.id === selectedRoleId);
 
   useEffect(() => {
     if (open) {
@@ -76,7 +77,7 @@ export function UserActionForm({
         form.reset({
           name: currentRow.name || "",
           email: currentRow.email || "",
-          phone_number: currentRow.phone_number || "",
+          phone: currentRow.phone || "",
           password: "",
           role_id: currentRow.role?.id,
         });
@@ -92,8 +93,8 @@ export function UserActionForm({
         delete values.password;
       }
       
-      const selectedRole = rolesData?.find((role:any) => role.id === values.role_id);
-      
+      const selectedRole = rolesData?.data?.find((role:any) => role.id == values.role_id);
+ 
       // Handle barge_operator role: only include barge_id, remove crane_id
       if(selectedRole?.role === 'barge_operator') {
         values.barge_id = values.barge_id || undefined;
@@ -106,8 +107,7 @@ export function UserActionForm({
       }
       // For other roles, remove both barge_id and crane_id
       else {
-        delete values.barge_id;
-        delete values.crane_id;
+         values.role_id = values.role_id;
       }
       
       onSubmitValues(values);
@@ -138,7 +138,7 @@ export function UserActionForm({
               <div className="space-y-4 p-4 border rounded-md">
                 <h3 className="text-sm font-medium text-gray-600">Credentials & Contact</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <TextInputField type="tel" label="Phone Number" placeholder="Enter phone number" control={form.control} name="phone_number" disabled={isDisabled} />
+                  <TextInputField type="tel" label="Phone Number" placeholder="Enter phone number" control={form.control} name="phone" disabled={isDisabled} />
                   {/* Hide password in view mode */}
                   {!isViewMode && (
                      <TextInputField type="password" label="Password" placeholder={isEdit ? "Leave blank to keep current" : "Enter a strong password"} control={form.control} name="password" disabled={isDisabled} />
@@ -156,8 +156,8 @@ export function UserActionForm({
                       <Select onValueChange={(value) => field.onChange(Number(value))} value={String(field.value || '')} disabled={isDisabled || isRolesLoading}>
                         <FormControl><SelectTrigger><SelectValue placeholder="Select a role" /></SelectTrigger></FormControl>
                         <SelectContent>
-                          {rolesData?.map((role:any) => (
-                            <SelectItem key={role?.id} value={String(role?.id)}>{role?.role?.replace(/_/g, ' ')?.replace(/\b\w/g, (c:any) => c.toUpperCase())}</SelectItem>
+                          {rolesData?.data?.map((role:any) => (
+                            <SelectItem key={role?.id} value={String(role?.id)}>{role?.name?.replace(/_/g, ' ')?.replace(/\b\w/g, (c:any) => c.toUpperCase())}</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>

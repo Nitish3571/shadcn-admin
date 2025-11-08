@@ -4,6 +4,9 @@ import useFetchData from '@/hooks/useFetchData'
 import usePostData from '@/hooks/usePostData'
 import { useUserStore } from '../store/user-store'
 
+export const useGetRoles = () => {
+  return useFetchData({ url: API.roles.list })
+}
 export const useGetUsers = (params:any) => {
   return useFetchData({ url: API.users.list, params })
 }

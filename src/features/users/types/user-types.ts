@@ -4,7 +4,7 @@
 export interface CreateUserPayload {
   name: string;
   email: string;
-  phone_number: string;
+  phone: string;
   password: string; 
   bio: string;
   date_of_birth: string;
