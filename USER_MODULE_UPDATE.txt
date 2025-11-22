@@ -1,0 +1,104 @@
+﻿=============================================================================
+USER MODULE - FULL UPDATE SUMMARY
+=============================================================================
+
+BACKEND API STRUCTURE (Laravel):
+---------------------------------
+Endpoint: POST /api/v1/users
+- Handles both CREATE and UPDATE (if 'id' is provided)
+- Supports multipart/form-data for avatar upload
+- Fields:
+  * id (optional, for update)
+  * name, email, phone, password (optional on update)
+  * user_type, status, bio, date_of_birth
+  * roles[] (array of role names)
+  * permissions[] (array of permission names - direct/additional permissions)
+  * avatar (file upload)
+
+Response Structure:
+{
+  "data": [{
+    "id": 1,
+    "name": "John Doe",
+    "email": "john@example.com",
+    "phone": "+1234567890",
+    "bio": "User bio",
+    "date_of_birth": "1990-01-01",
+    "user_type": 1,
+    "status": 1,
+    "avatar_url": "http://...",
+    "roles": [
+      { "id": 1, "name": "admin" }
+    ],
+    "permissions": [
+      { "id": 1, "name": "users.create" }
+    ]
+  }]
+}
+
+Note: 'permissions' includes ALL permissions (from roles + direct permissions)
+
+FRONTEND UPDATES (React/TypeScript):
+-------------------------------------
+
+1. TYPES UPDATED (user.types.ts):
+   - Removed 'extra_permissions' field
+   - 'permissions' now represents all permissions (role + direct)
+   - Added proper TypeScript interfaces
+
+2. USER FORM UPDATED (user-form.tsx):
+    Avatar upload with preview
+    Proper role/permission handling
+    Distinguishes between role permissions and direct permissions
+    Form validation with Zod schema
+    Edit mode: password optional
+    View mode: read-only display
+    Proper FormData submission for multipart upload
+
+3. SERVICES UPDATED (users.services.ts):
+    useGetRoles() - uses API.roles.all
+    useGetPermissions() - uses API.permissions.list
+    useGetUsers() - list with pagination
+    useGetUserById() - fetch single user
+    usePostUser() - create/update with FormData
+    useDeleteUser() - delete user(s)
+
+4. COLUMNS (users.column.tsx):
+    Dynamic column generation from API
+    Displays roles as badges
+    Status indicator with color coding
+    Actions column (view, edit, delete)
+
+KEY FEATURES:
+-------------
+ Avatar upload with image preview
+ Role-based permissions
+ Additional direct permissions (beyond role permissions)
+ Form validation (email, phone, password strength)
+ Edit mode with optional password change
+ View-only mode
+ Status management (Active/Inactive)
+ User type selection
+ Date of birth picker
+ Bio text area
+ Responsive design
+ Loading states
+ Error handling with toast notifications
+
+API ENDPOINTS USED:
+-------------------
+GET  /api/v1/users              - List users
+GET  /api/v1/users/{id}         - Get single user
+POST /api/v1/users              - Create/Update user
+DELETE /api/v1/users/{ids}      - Delete user(s)
+GET  /api/v1/roles/all          - Get all roles
+GET  /api/v1/permissions        - Get all permissions
+
+FILES UPDATED:
+--------------
+1. my-app/src/features/users/types/user.types.ts
+2. my-app/src/features/users/components/user-form.tsx
+3. my-app/src/features/users/services/users.services.ts
+
+All functionality is now aligned with the backend API structure!
+=============================================================================

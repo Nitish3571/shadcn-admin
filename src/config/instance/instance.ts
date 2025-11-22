@@ -1,4 +1,4 @@
-import { useAuthStore } from '@/stores/authStore';
+﻿import { useAuthStore } from '@/stores/authStore';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
@@ -7,27 +7,26 @@ import axios, {
 } from 'axios';
 import Cookies from 'js-cookie';
 
-// const token = Cookies.get('token') || '';
-
 const axiosInstance = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api/v1/',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1/',
   timeout: 50000,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
 });
 
-// Define a general API response structure
 interface ApiResponse<T> {
   status: boolean;
   statusCode: number;
-  error: boolean;
+  title?: string;
   message?: string;
   data: T;
 }
 
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token=useAuthStore.getState().token;
-    config.headers.Authorization = `Bearer ${token}`;
+    const token = useAuthStore.getState().token;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     if (config.data instanceof FormData) {
       config.headers['Content-Type'] = 'multipart/form-data';
     } else if (config.data) {
@@ -40,22 +39,19 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   <T>(res: AxiosResponse<ApiResponse<T>>) => {
-  
     if (!res.data) throw new Error('Error in response');
     const { statusCode } = res.data;
-    const hasSuccess = (statusCode === 200 || statusCode === 201) ;
+    const hasSuccess = statusCode === 200 || statusCode === 201;
     if (hasSuccess) {
-      // The data is already intact, no need to reassign
       return res;
     }
     throw new Error(res.data.message || 'Unknown API error');
   },
   (error: AxiosError) => {
-    
     const status = error.response?.status;
     if (status === 401) {
-      window.localStorage.clear();
       Cookies.remove('token');
+      useAuthStore.getState().logout();
     }
     return Promise.reject(error);
   }

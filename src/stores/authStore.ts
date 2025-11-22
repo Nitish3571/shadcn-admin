@@ -1,5 +1,4 @@
-import { persist } from 'zustand/middleware';
-// src/store/useAuthStore.ts
+﻿import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie'
 import { create } from 'zustand'
 
@@ -29,9 +28,6 @@ type AuthState = {
   logout: () => void
 }
 
-// src/store/useAuthStore.ts
-
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -39,18 +35,18 @@ export const useAuthStore = create<AuthState>()(
       token: Cookies.get('token') || null,
       setUserInfo: (user) => set({ userInfo: user }),
       setToken: (token) => {
-        Cookies.set('token', token);
+        Cookies.set('token', token, { expires: 7, sameSite: 'strict' });
         set({ token });
       },
       logout: () => {
         Cookies.remove('token');
+        localStorage.removeItem('auth-storage');
         set({ userInfo: null, token: null });
       },
     }),
     {
-      name: 'auth-storage', // key in localStorage
-      partialize: (state) => ({ userInfo: state.userInfo, token: state.token }),
+      name: 'auth-storage',
+      partialize: (state) => ({ userInfo: state.userInfo }),
     }
   )
 );
-

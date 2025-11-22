@@ -1,4 +1,4 @@
-﻿export interface Role {
+export interface Role {
   id: number;
   name: string;
   display_name?: string;
@@ -8,8 +8,9 @@
 export interface Permission {
   id: number;
   name: string;
-  display_name: string;
+  display_name?: string;
   description?: string;
+  module?: string;
 }
 
 export interface User {
@@ -23,11 +24,9 @@ export interface User {
   status: number;
   avatar_url?: string;
   roles: Role[];
-  permissions: Permission[];
-  extra_permissions?: Permission[];
+  permissions: Permission[]; // All permissions (from roles + direct)
   created_at?: string;
   updated_at?: string;
-  deleted_at?: string | null;
 }
 
 export interface UserFormData {
@@ -36,13 +35,22 @@ export interface UserFormData {
   email: string;
   phone: string;
   password?: string;
-  confirmPassword?: string;
   bio?: string;
   date_of_birth?: string;
   user_type: number;
   status: number;
   roles: string[];
-  permissions?: string[];
+  permissions?: string[]; // Direct permissions only
   avatar?: File;
-  isEdit?: boolean;
+}
+
+export interface UsersListResponse {
+  data: User[];
+  total: number;
+  column: any[];
+  datatable_column: any[];
+}
+
+export interface UserResponse {
+  data: User;
 }

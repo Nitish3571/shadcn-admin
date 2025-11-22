@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+﻿import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { AxiosError } from 'axios'
 import {
@@ -13,14 +13,12 @@ import { handleServerError } from '@/utils/handle-server-error'
 import { FontProvider } from './context/font-context'
 import { ThemeProvider } from './context/theme-context'
 import './index.css'
-// Generated Routes
 import { routeTree } from './routeTree.gen'
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: (failureCount, error) => {
-        // eslint-disable-next-line no-console
         if (import.meta.env.DEV) console.log({ failureCount, error })
 
         if (failureCount >= 0 && import.meta.env.DEV) return false
@@ -32,7 +30,7 @@ const queryClient = new QueryClient({
         )
       },
       refetchOnWindowFocus: import.meta.env.PROD,
-      staleTime: 10 * 1000, // 10s
+      staleTime: 30 * 1000, // 30s - increased from 10s
     },
     mutations: {
       onError: (error) => {
@@ -51,8 +49,8 @@ const queryClient = new QueryClient({
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           toast.error('Session expired!')
-          useAuthStore.getState().auth.reset()
-          const redirect = `${router.history.location.href}`
+          useAuthStore.getState().logout()
+          const redirect = ``
           router.navigate({ to: '/sign-in', search: { redirect } })
         }
         if (error.response?.status === 500) {
@@ -60,14 +58,13 @@ const queryClient = new QueryClient({
           router.navigate({ to: '/500' })
         }
         if (error.response?.status === 403) {
-          // router.navigate("/forbidden", { replace: true });
+          toast.error('Access forbidden!')
         }
       }
     },
   }),
 })
 
-// Create a new router instance
 const router = createRouter({
   routeTree,
   context: { queryClient },
@@ -75,14 +72,12 @@ const router = createRouter({
   defaultPreloadStaleTime: 0,
 })
 
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router
   }
 }
 
-// Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)

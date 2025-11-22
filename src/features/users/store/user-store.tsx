@@ -1,17 +1,16 @@
-import { create } from "zustand";
-import { User } from "../components/users.column";
+import { create } from 'zustand';
+import { User } from '../types/user.types';
 
+export type DialogType = 'add' | 'edit' | 'delete' | 'view' | null;
 
-export type DialogType = "add" | "edit" | "delete" | "view" | "restore" | null;
-
-interface StoreState {
+interface UserStoreState {
   open: DialogType;
   setOpen: (open: DialogType) => void;
   currentRow: User | null;
   setCurrentRow: (row: User | null) => void;
 }
 
-export const useUserStore = create<StoreState>((set) => ({
+export const useUserStore = create<UserStoreState>((set) => ({
   open: null,
   setOpen: (open) => set({ open }),
   currentRow: null,

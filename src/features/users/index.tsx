@@ -1,22 +1,33 @@
-import { PageHeader } from '@/components/shared/layout/page-header'
+﻿import { PageHeader } from '@/components/shared/layout/page-header'
 import PageLayout from '@/components/shared/layout/page-layout'
 import { FilterConfig } from '@/components/shared/table/filter-toolbar'
 import { GlobalTable } from '@/components/shared/table/global-table'
 import GlobalFilterSection from '@/components/shared/table/global-table-filters'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useGetUsers } from './services/users.services'
 import GlobalLoader from '@/components/shared/global-loader'
 import { useUserStore } from './store/user-store'
 import { MutateUserModal } from './components/user-actions'
-import { userColumns } from './components/users.column'
+import { generateDynamicColumns } from './components/users.column'
+import { UserDeleteModal } from './components/user-delete-modal'
 
 export default function Users() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
   const [status, setStatus] = useState<string | null>(null)
 
-  // ✅ Always call hooks before conditional returns
   const { setOpen } = useUserStore();
   const { data: listData, isFetching: loading, error }: any = useGetUsers(params)
+
+  // Generate dynamic columns based on API response
+  const columns = useMemo(() => {
+    if (listData?.datatable_column) {
+      return generateDynamicColumns(listData.datatable_column);
+    }
+    if (listData?.column) {
+      return generateDynamicColumns(listData.column);
+    }
+    return generateDynamicColumns();
+  }, [listData?.datatable_column, listData?.column]);
 
   const handleSearchChange = (value: string) => {
     setParams((prev) => ({ ...prev, search: value }))
@@ -44,7 +55,6 @@ export default function Users() {
     setOpen("add");
   }
 
-  // ✅ Now condition checks after all hooks
   if (loading) return <GlobalLoader variant="default" text="Loading Users ...." />
   if (error) return <div>Error: {error.message}</div>
   if (!listData) return <div>No data found</div>
@@ -55,7 +65,7 @@ export default function Users() {
       <GlobalFilterSection filters={filters} />
       <GlobalTable
         data={listData?.data}
-        columns={userColumns}
+        columns={columns}
         totalCount={listData?.total}
         currentPage={params.page}
         pageSize={params.limit}
@@ -65,6 +75,7 @@ export default function Users() {
         loading={loading}
       />
       <MutateUserModal />
+      <UserDeleteModal />
     </PageLayout>
   )
 }
