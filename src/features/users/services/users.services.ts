@@ -11,7 +11,6 @@ export const useGetRoles = () => {
     queryOptions: {
       select: (data: any) => {
         console.log('Raw Roles Response:', data);
-        // Handle both wrapped and unwrapped responses
         return data?.data || data;
       }
     }
@@ -24,7 +23,6 @@ export const useGetPermissions = () => {
     queryOptions: {
       select: (data: any) => {
         console.log('Raw Permissions Response:', data);
-        // Handle both wrapped and unwrapped responses
         return data?.data || data;
       }
     }

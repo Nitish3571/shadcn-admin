@@ -7,23 +7,23 @@
   },
   users: {
     list: 'users',
-    store: 'users', // POST - handles create/update/avatar/permissions all in one
+    store: 'users', 
     show: (id: number) => `users/${id}`,
-    delete: (ids: string) => `users/${ids}` // Supports comma-separated IDs like '1,2,3'
+    delete: (ids: string) => `users/${ids}` 
   },
   roles: {
     list: 'roles',
     all: 'roles/all',
-    modulePermissions: 'roles/modulePermissions', // Get all permissions grouped by module
-    permissions: (id: number) => `roles/${id}/permissions`, // Get permissions by role ID
-    store: 'roles', // POST - handles create/update
+    modulePermissions: 'roles/modulePermissions', 
+    permissions: (id: number) => `roles/${id}/permissions`, 
+    store: 'roles', 
     show: (id: number) => `roles/${id}`,
     delete: (ids: string) => `roles/${ids}`,
     assignPermissions: (id: number) => `roles/${id}/permissions`
   },
   permissions: {
-    list: 'permissions', // Read-only - managed via config
-    show: (id: number) => `permissions/${id}` // Read-only
+    list: 'permissions',
+    show: (id: number) => `permissions/${id}`
   }
 };
 
