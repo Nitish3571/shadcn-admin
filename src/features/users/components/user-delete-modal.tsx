@@ -1,10 +1,10 @@
-﻿'use client';
+'use client';
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { useUserStore } from '../store/user-store';
 import { useDeleteUser } from '../services/users.services';
+import { DeleteModal } from '@/components/shared/comman-delete-model';
 
 export function UserDeleteModal() {
   const { open, setOpen, currentRow } = useUserStore();
@@ -25,27 +25,16 @@ export function UserDeleteModal() {
   };
 
   return (
-    <AlertDialog open={open === 'delete'} onOpenChange={(state) => !state && setOpen(null)}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the user
-            <span className="font-semibold"> {currentRow?.name}</span> and remove their data from the system.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-          <AlertDialogAction
-            onClick={handleDelete}
-            disabled={isPending}
-            className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
-          >
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <DeleteModal
+      isOpen={open === 'delete'}
+      onClose={(state) => !state && setOpen(null)}
+      onConfirm={handleDelete}
+      loading={isPending}
+      title="Delete User"
+      description={`Are you sure you want to delete ${currentRow?.name || 'this user'}? This action cannot be undone and will permanently remove their data from the system.`}
+      confirmButtonText="Delete"
+      iconComponent={<Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />}
+      confirmButtonColor="destructive"
+    />
   );
 }
