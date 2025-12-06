@@ -3,7 +3,12 @@
     login: 'auth/login',
     register: 'auth/register',
     logout: 'auth/logout',
-    me: 'me'
+    me: 'me',
+    verifyEmail: 'auth/verify-email',
+    resendVerification: 'auth/resend-verification',
+    forgotPassword: 'auth/forgot-password',
+    resetPassword: 'auth/reset-password',
+    changePassword: 'auth/change-password'
   },
   users: {
     list: 'users',

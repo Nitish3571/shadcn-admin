@@ -78,18 +78,20 @@ export function UserAuthForm({ className, ...props }: UserAuthFormProps) {
           control={form.control}
           name='password'
           render={({ field }) => (
-            <FormItem className='relative'>
-              <FormLabel>Password</FormLabel>
+            <FormItem>
+              <div className='flex items-center justify-between'>
+                <FormLabel>Password</FormLabel>
+                <Link
+                  to='/forgot-password'
+                  className='text-muted-foreground text-sm font-medium hover:opacity-75'
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
               <FormMessage />
-              <Link
-                to='/forgot-password'
-                className='text-muted-foreground absolute -top-0.5 right-0 text-sm font-medium hover:opacity-75'
-              >
-                Forgot password?
-              </Link>
             </FormItem>
           )}
         />

@@ -2,7 +2,7 @@ import { HTMLAttributes, useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconBrandFacebook, IconBrandGithub } from '@tabler/icons-react'
+import { IconBrandFacebook, IconBrandGithub, IconCheck } from '@tabler/icons-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -15,12 +15,17 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
-import { useLogin } from '../services/sign-up.services'
+import { useRegister } from '../services/sign-up.services'
+import { toast } from 'sonner'
+import { useNavigate } from '@tanstack/react-router'
 
 type SignUpFormProps = HTMLAttributes<HTMLFormElement>
 
 const formSchema = z
   .object({
+    name: z
+      .string()
+      .min(1, { message: 'Please enter your name' }),
     email: z
       .string()
       .min(1, { message: 'Please enter your email' })
@@ -30,36 +35,77 @@ const formSchema = z
       .min(1, {
         message: 'Please enter your password',
       })
-      .min(7, {
-        message: 'Password must be at least 7 characters long',
+      .min(8, {
+        message: 'Password must be at least 8 characters long',
       }),
-    confirmPassword: z.string(),
+    password_confirmation: z.string(),
   })
-  .refine((data) => data.password === data.confirmPassword, {
+  .refine((data) => data.password === data.password_confirmation, {
     message: "Passwords don't match.",
-    path: ['confirmPassword'],
+    path: ['password_confirmation'],
   })
 
 export function SignUpForm({ className, ...props }: SignUpFormProps) {
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const { mutate: loginMutate } = useLogin()
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
-      confirmPassword: '',
+      password_confirmation: '',
+    },
+  })
+
+  const { mutate: register } = useRegister({
+    onSuccess: () => {
+      setIsLoading(false)
+      setUserEmail(form.getValues('email'))
+      setRegistrationSuccess(true)
+      toast.success('Account created successfully! Please check your email to verify your account.')
+    },
+    onError: (error: any) => {
+      setIsLoading(false)
+      const errorMsg = 
+        error?.response?.data?.message || 
+        error?.response?.data?.errors?.email?.[0] ||
+        'Registration failed. Please try again.'
+      toast.error(errorMsg)
     },
   })
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    loginMutate(data)
+    register(data)
+  }
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+  if (registrationSuccess) {
+    return (
+      <div className='space-y-4 text-center'>
+        <div className='mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100'>
+          <IconCheck className='h-8 w-8 text-green-600' />
+        </div>
+        <div className='space-y-2'>
+          <h3 className='text-lg font-semibold'>Check your email</h3>
+          <p className='text-muted-foreground text-sm'>
+            We've sent a verification link to <strong>{userEmail}</strong>
+          </p>
+          <p className='text-muted-foreground text-sm'>
+            Please verify your email to activate your account.
+          </p>
+        </div>
+        <Button
+          onClick={() => navigate({ to: '/sign-in' })}
+          className='w-full'
+        >
+          Go to Login
+        </Button>
+      </div>
+    )
   }
 
   return (
@@ -69,6 +115,19 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
         className={cn('grid gap-3', className)}
         {...props}
       >
+        <FormField
+          control={form.control}
+          name='name'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder='John Doe' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name='email'
@@ -97,7 +156,7 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
         />
         <FormField
           control={form.control}
-          name='confirmPassword'
+          name='password_confirmation'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Confirm Password</FormLabel>
