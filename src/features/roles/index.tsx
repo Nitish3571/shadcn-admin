@@ -74,8 +74,6 @@ export default function Users() {
         isPaginationEnabled={true}
         loading={loading}
       />
-      {/* <MutateUserModal />
-      <UserDeleteModal /> */}
       <MutateRoleModal />
       <RoleDeleteModal />
     </PageLayout>
