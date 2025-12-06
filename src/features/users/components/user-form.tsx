@@ -33,12 +33,7 @@ import { PermissionsManager } from './PermissionsManager';
 import { userFormSchema, UserFormSchema } from '../schema/user-schema';
 import { useGetRoles, useGetPermissions, useGetUserById, usePostUser } from '../services/users.services';
 import { useUserStore } from '../store/user-store';
-
-const userTypes = [
-  { label: 'Admin', value: 1 },
-  { label: 'Manager', value: 2 },
-  { label: 'Regular User', value: 3 },
-];
+import { DEFAULT_USER_TYPE } from '@/types/enums';
 
 const formatDateForInput = (dateString?: string): string => {
   if (!dateString) return '';
@@ -95,7 +90,7 @@ export function UserForm() {
       bio: '',
       date_of_birth: '',
       status: 1,
-      user_type: 3,
+      user_type: DEFAULT_USER_TYPE, // Default to regular user
       roles: [],
       permissions: [],
       isEdit: false,
@@ -200,7 +195,7 @@ export function UserForm() {
         bio: user.bio || '',
         date_of_birth: formatDateForInput(user.date_of_birth),
         status: user.status || 1,
-        user_type: user.user_type || 3,
+        user_type: user.user_type || DEFAULT_USER_TYPE,
         roles: roleNames,
         permissions: Array.from(new Set([...Array.from(rolePermissionNames), ...directPermissionNames])),
         password: '',
@@ -223,7 +218,7 @@ export function UserForm() {
         bio: '',
         date_of_birth: '',
         status: 1,
-        user_type: 3,
+        user_type: DEFAULT_USER_TYPE,
         roles: [],
         permissions: [],
         isEdit: false,
@@ -253,7 +248,7 @@ export function UserForm() {
     formData.append('name', values.name);
     formData.append('email', values.email);
     formData.append('phone', values.phone);
-    formData.append('user_type', values.user_type.toString());
+    // user_type is handled by backend with default value 2
     formData.append('status', values.status.toString());
 
     if (values.password && values.password !== '') {
@@ -501,35 +496,6 @@ export function UserForm() {
                           <FormControl>
                             <Input placeholder="+1234567890" disabled={isDisabled} {...field} />
                           </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="user_type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>User Type</FormLabel>
-                          <Select
-                            onValueChange={(value) => field.onChange(Number(value))}
-                            value={String(field.value)}
-                            disabled={isDisabled}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select user type" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {userTypes.map((type) => (
-                                <SelectItem key={type.value} value={String(type.value)}>
-                                  {type.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
                           <FormMessage />
                         </FormItem>
                       )}
