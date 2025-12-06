@@ -34,6 +34,7 @@ import { userFormSchema, UserFormSchema } from '../schema/user-schema';
 import { useGetRoles, useGetPermissions, useGetUserById, usePostUser } from '../services/users.services';
 import { useUserStore } from '../store/user-store';
 import { DEFAULT_USER_TYPE } from '@/types/enums';
+import { useAuthStore } from '@/stores/authStore';
 
 const formatDateForInput = (dateString?: string): string => {
   if (!dateString) return '';
@@ -62,12 +63,22 @@ const normalizePermissionName = (name: string) => {
 
 export function UserForm() {
   const { open, setOpen, currentRow } = useUserStore();
+  const userInfo = useAuthStore((state) => state.userInfo);
+  const hasPermission = useAuthStore((state) => state.hasPermission);
   const isEdit = open === 'edit';
   const isView = open === 'view';
   const userId = currentRow?.id;
+  
+  // Check if user has permission to view/manage roles (from Role Management module)
+  const canManageRoles = hasPermission(['roles.view', 'roles.assign', 'roles.create', 'roles.edit']);
 
-  const { data: rolesResponse, isLoading: rolesLoading } = useGetRoles();
-  const { data: permissionsResponse, isLoading: permissionsLoading } = useGetPermissions();
+  // Only fetch roles/permissions if user has permission to manage them
+  const { data: rolesResponse, isLoading: rolesLoading } = useGetRoles({ 
+    enabled: canManageRoles 
+  });
+  const { data: permissionsResponse, isLoading: permissionsLoading } = useGetPermissions({ 
+    enabled: canManageRoles 
+  });
   const { data: userData, isLoading: userLoading } = useGetUserById(userId!);
   const { mutate: saveUser, isPending: saving } = usePostUser();
 
@@ -138,6 +149,8 @@ export function UserForm() {
 
   // Compute role-derived permissions when selectedRoles change
   useEffect(() => {
+    if (!canManageRoles) return; // Skip if user can't manage roles
+    
     const selectedRoleObjs = roles.filter((r) => selectedRoles.includes(r.name));
     const derived = new Set<string>();
     selectedRoleObjs.forEach((r) => {
@@ -146,20 +159,18 @@ export function UserForm() {
       });
     });
     const derivedArr = Array.from(derived);
+    
+    // Update both states together to avoid multiple renders
     setRoleDerivedPermissions(derivedArr);
-
-    // Merge with manualPermissions (manual should persist)
-    const merged = Array.from(new Set([...derivedArr, ...manualPermissions]));
-    setSelectedPermissions(merged);
-    // sync form
-    form.setValue('permissions', merged);
+    
+    // Merge with current manual permissions using functional update
+    setSelectedPermissions((prevSelected) => {
+      // Get manual permissions (those not from the NEW derived list)
+      const manualPerms = prevSelected.filter(p => !derivedArr.includes(p));
+      return Array.from(new Set([...derivedArr, ...manualPerms]));
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedRoles, roles]);
-
-  // Keep form.permissions in sync when selectedPermissions changes
-  useEffect(() => {
-    form.setValue('permissions', selectedPermissions);
-  }, [selectedPermissions, form]);
+  }, [selectedRoles, roles, canManageRoles]);
 
   // When loading user for edit/view, populate states
   useEffect(() => {
@@ -257,11 +268,14 @@ export function UserForm() {
     if (values.bio) formData.append('bio', values.bio);
     if (values.date_of_birth) formData.append('date_of_birth', values.date_of_birth);
 
-    // Append roles
-    (values.roles || []).forEach((role) => formData.append('roles[]', role));
+    // Only append roles/permissions if user has permission to manage them
+    if (canManageRoles) {
+      // Append roles
+      (values.roles || []).forEach((role) => formData.append('roles[]', role));
 
-    // Append direct permissions (we will send selectedPermissions - but you may want to send only manual ones)
-    (selectedPermissions || []).forEach((permission) => formData.append('permissions[]', permission));
+      // Append direct permissions (we will send selectedPermissions - but you may want to send only manual ones)
+      (selectedPermissions || []).forEach((permission) => formData.append('permissions[]', permission));
+    }
 
     // Append avatar if selected
     if (avatarFile) {
@@ -426,7 +440,7 @@ export function UserForm() {
             <Tabs defaultValue="basic" className="space-y-4">
               <TabsList>
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                <TabsTrigger value="rights">Rights</TabsTrigger>
+                {canManageRoles && <TabsTrigger value="rights">Rights</TabsTrigger>}
               </TabsList>
 
               {/* ----------------- BASIC INFO TAB ----------------- */}
@@ -600,6 +614,7 @@ export function UserForm() {
               </TabsContent>
 
               {/* ----------------- RIGHTS TAB ----------------- */}
+              {canManageRoles && (
               <TabsContent value="rights" className="p-0">
                 <div className="space-y-4 p-4 border rounded-md">
                   <h3 className="text-sm font-medium text-gray-700">Roles</h3>
@@ -641,6 +656,7 @@ export function UserForm() {
               
                 </div>
               </TabsContent>
+              )}
             </Tabs>
 
             <input type="hidden" {...form.register('roles')} value={selectedRoles.join(',')} />

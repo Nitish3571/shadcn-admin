@@ -5,9 +5,10 @@ import usePostData from '@/hooks/usePostData';
 import { useUserStore } from '../store/user-store';
 import { UsersListResponse, UserResponse } from '../types/user.types';
 
-export const useGetRoles = () => {
+export const useGetRoles = (options?: { enabled?: boolean }) => {
   return useFetchData({ 
     url: API.roles.all,
+    enabled: options?.enabled,
     queryOptions: {
       select: (data: any) => {
         return data?.data || data;
@@ -16,9 +17,10 @@ export const useGetRoles = () => {
   });
 };
 
-export const useGetPermissions = () => {
+export const useGetPermissions = (options?: { enabled?: boolean }) => {
   return useFetchData({ 
     url: API.permissions.list,
+    enabled: options?.enabled,
     queryOptions: {
       select: (data: any) => {
         return data?.data || data;
