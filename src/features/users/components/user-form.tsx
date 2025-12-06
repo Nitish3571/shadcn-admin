@@ -65,6 +65,7 @@ export function UserForm() {
   const { open, setOpen, currentRow } = useUserStore();
   const userInfo = useAuthStore((state) => state.userInfo);
   const hasPermission = useAuthStore((state) => state.hasPermission);
+  const refreshUserInfo = useAuthStore((state) => state.refreshUserInfo);
   const isEdit = open === 'edit';
   const isView = open === 'view';
   const userId = currentRow?.id;
@@ -283,8 +284,16 @@ export function UserForm() {
     }
 
     saveUser(formData, {
-      onSuccess: () => {
+      onSuccess: async (data: any) => {
         toast.success(isEdit ? 'User updated successfully!' : 'User created successfully!');
+        
+        // If editing current user, refresh their permissions instantly
+        const updatedUserId = data?.data?.data?.[0]?.id || currentRow?.id;
+        if (updatedUserId === userInfo?.id) {
+          await refreshUserInfo();
+          toast.info('Your permissions have been updated!');
+        }
+        
         setOpen(null);
         form.reset();
         setAvatarFile(null);

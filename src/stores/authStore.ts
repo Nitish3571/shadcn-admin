@@ -29,6 +29,7 @@ type AuthState = {
   setUserInfo: (user: User) => void;
   setToken: (token: string) => void;
   logout: () => void;
+  refreshUserInfo: () => Promise<void>;
   hasPermission: (permission: string | string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
   hasRole: (role: string | string[]) => boolean;
@@ -51,6 +52,28 @@ export const useAuthStore = create<AuthState>()(
         Cookies.remove('token');
         localStorage.removeItem('auth-storage');
         set({ userInfo: null, token: null });
+      },
+      
+      // Refresh user info from server (to get updated permissions)
+      refreshUserInfo: async () => {
+        const { token } = get();
+        if (!token) return;
+        
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1'}/me`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/json',
+            },
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            set({ userInfo: data.data || data });
+          }
+        } catch (error) {
+          console.error('Failed to refresh user info:', error);
+        }
       },
       
       // Check if user has permission(s) - OR logic for arrays

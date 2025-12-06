@@ -6,8 +6,9 @@ import { SidebarProvider } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/layout/app-sidebar'
 import SkipToMain from '@/components/skip-to-main'
 import { useAuthStore } from '@/stores/authStore'
+import { PermissionSyncWrapper } from '@/components/PermissionSyncWrapper'
 import { Header } from './header'
-import { Search } from '../search'
+import { Search } from '@/components/search'
 import { ThemeSwitch } from '../theme-switch'
 import { ProfileDropdown } from '../profile-dropdown'
 import { sidebarData } from './data/sidebar-data'
@@ -20,6 +21,7 @@ export function AuthenticatedLayout({ children }: Props) {
   const defaultOpen = Cookies.get('sidebar_state') !== 'false'
   const navigate = useNavigate()
   const { token } = useAuthStore()
+  
   if (!token) {
     navigate({
       to: '/sign-in-2',
@@ -27,36 +29,37 @@ export function AuthenticatedLayout({ children }: Props) {
     })
     return null
   }
+  
   return (
-    <SearchProvider>
+    <PermissionSyncWrapper>
+      <SearchProvider>
+        <SidebarProvider defaultOpen={defaultOpen}>
+          <SkipToMain />
+          <AppSidebar />
 
-      <SidebarProvider defaultOpen={defaultOpen}>
-
-        <SkipToMain />
-        <AppSidebar />
-
-        <div
-          id='content'
-          className={cn(
-            'ml-auto w-full max-w-full',
-            'peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)]',
-            'peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]',
-            'sm:transition-[width] sm:duration-200 sm:ease-linear',
-            'flex h-svh flex-col',
-            'group-data-[scroll-locked=1]/body:h-full',
-            'has-[main.fixed-main]:group-data-[scroll-locked=1]/body:h-svh'
-          )}
-        >
-          <Header fixed>
-            <Search />
-            <div className='ml-auto flex items-center space-x-4'>
-              <ThemeSwitch />
-              <ProfileDropdown user={sidebarData.user} />
-            </div>
-          </Header>
-          {children ? children : <Outlet />}
-        </div>
-      </SidebarProvider>
-    </SearchProvider>
+          <div
+            id='content'
+            className={cn(
+              'ml-auto w-full max-w-full',
+              'peer-data-[state=collapsed]:w-[calc(100%-var(--sidebar-width-icon)-1rem)]',
+              'peer-data-[state=expanded]:w-[calc(100%-var(--sidebar-width))]',
+              'sm:transition-[width] sm:duration-200 sm:ease-linear',
+              'flex h-svh flex-col',
+              'group-data-[scroll-locked=1]/body:h-full',
+              'has-[main.fixed-main]:group-data-[scroll-locked=1]/body:h-svh'
+            )}
+          >
+            <Header fixed>
+              <Search />
+              <div className='ml-auto flex items-center space-x-4'>
+                <ThemeSwitch />
+                <ProfileDropdown user={sidebarData.user} />
+              </div>
+            </Header>
+            {children ? children : <Outlet />}
+          </div>
+        </SidebarProvider>
+      </SearchProvider>
+    </PermissionSyncWrapper>
   )
 }

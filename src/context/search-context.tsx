@@ -6,7 +6,7 @@ interface SearchContextType {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const SearchContext = React.createContext<SearchContextType | null>(null)
+export const SearchContext = React.createContext<SearchContextType | null>(null)
 
 interface Props {
   children: React.ReactNode
