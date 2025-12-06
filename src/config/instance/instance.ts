@@ -1,4 +1,5 @@
 ﻿import { useAuthStore } from '@/stores/authStore';
+import { env } from '@/config/env';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
@@ -8,7 +9,7 @@ import axios, {
 import Cookies from 'js-cookie';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000/api/v1/',
+  baseURL: env.VITE_API_BASE_URL,
   timeout: 50000,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
 });

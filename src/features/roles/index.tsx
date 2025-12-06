@@ -8,9 +8,10 @@ import GlobalLoader from '@/components/shared/global-loader'
 import { useRoleStore } from './store/role-store'
 import { useGetRoles } from './services/roles.services'
 import { generateDynamicColumns } from './components/roles.column'
-import { MutateRoleModal, MutateUserModal } from './components/role-actions'
+import { MutateRoleModal } from './components/role-actions'
 import { RoleDeleteModal } from './components/role-delete-modal'
 import { usePermission } from '@/hooks/usePermission'
+import { USER_STATUS_OPTIONS } from '@/types/enums'
 
 export default function Users() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
@@ -45,21 +46,41 @@ export default function Users() {
 
   const filters: FilterConfig[] = [
     { key: 'name', value: params.search, type: 'search', placeholder: 'Search by name...', onChange: handleSearchChange },
-    { key: 'status', value: status, type: 'select', placeholder: 'Search by status...', options: [
-      { label: 'Active', value: '1' },
-      { label: 'Inactive', value: '2' },
-      { label: 'Invited', value: '3' },
-      { label: 'Suspended', value: '4' }
-    ], onChange: (value: string) => setStatus(value) },
+    { key: 'status', value: status, type: 'select', placeholder: 'Search by status...', options: USER_STATUS_OPTIONS, onChange: (value: string) => setStatus(value) },
   ]
 
   const handleRoleAdd = () => {
     setOpen("add");
   }
 
-  if (loading) return <GlobalLoader variant="default" text="Loading Users ...." />
-  if (error) return <div>Error: {error.message}</div>
-  if (!listData) return <div>No data found</div>
+  if (loading) return <GlobalLoader variant="default" text="Loading Roles..." />
+  if (error) return (
+    <PageLayout>
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-red-500 font-semibold">Error loading roles</p>
+          <p className="text-gray-600 mt-2">{error.message}</p>
+        </div>
+      </div>
+    </PageLayout>
+  )
+  if (!listData?.data || listData.data.length === 0) return (
+    <PageLayout>
+      <PageHeader 
+        title="Role List" 
+        buttonLabel={hasPermission('roles.create') ? "Add Role" : undefined}
+        description="Manage your the role here" 
+        onButtonClick={hasPermission('roles.create') ? handleRoleAdd : undefined}
+      />
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <p className="text-gray-500 font-semibold">No roles found</p>
+          <p className="text-gray-400 mt-2">Start by adding your first role</p>
+        </div>
+      </div>
+      <MutateRoleModal />
+    </PageLayout>
+  )
 
   return (
     <PageLayout>
