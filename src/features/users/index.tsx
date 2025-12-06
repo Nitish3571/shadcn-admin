@@ -10,12 +10,14 @@ import { useUserStore } from './store/user-store'
 import { MutateUserModal } from './components/user-actions'
 import { generateDynamicColumns } from './components/users.column'
 import { UserDeleteModal } from './components/user-delete-modal'
+import { usePermission } from '@/hooks/usePermission'
 
 export default function Users() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
   const [status, setStatus] = useState<string | null>(null)
 
   const { setOpen } = useUserStore();
+  const { hasPermission } = usePermission();
   const { data: listData, isFetching: loading, error }: any = useGetUsers(params)
 
   // Generate dynamic columns based on API response
@@ -61,7 +63,12 @@ export default function Users() {
 
   return (
     <PageLayout>
-      <PageHeader title="User List" buttonLabel="Add User" description="Manage your the user here" onButtonClick={handleUserAdd} />
+      <PageHeader 
+        title="User List" 
+        buttonLabel={hasPermission('users.create') ? "Add User" : undefined}
+        description="Manage your the user here" 
+        onButtonClick={hasPermission('users.create') ? handleUserAdd : undefined}
+      />
       <GlobalFilterSection filters={filters} />
       <GlobalTable
         data={listData?.data}

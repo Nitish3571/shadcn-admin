@@ -10,12 +10,14 @@ import { useGetRoles } from './services/roles.services'
 import { generateDynamicColumns } from './components/roles.column'
 import { MutateRoleModal, MutateUserModal } from './components/role-actions'
 import { RoleDeleteModal } from './components/role-delete-modal'
+import { usePermission } from '@/hooks/usePermission'
 
 export default function Users() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
   const [status, setStatus] = useState<string | null>(null)
 
   const { setOpen } = useRoleStore();
+  const { hasPermission } = usePermission();
   const { data: listData, isFetching: loading, error }: any = useGetRoles(params)
 
   // Generate dynamic columns based on API response
@@ -61,7 +63,12 @@ export default function Users() {
 
   return (
     <PageLayout>
-      <PageHeader title="Role List" buttonLabel="Add Role" description="Manage your the role here" onButtonClick={handleRoleAdd} />
+      <PageHeader 
+        title="Role List" 
+        buttonLabel={hasPermission('roles.create') ? "Add Role" : undefined}
+        description="Manage your the role here" 
+        onButtonClick={hasPermission('roles.create') ? handleRoleAdd : undefined}
+      />
       <GlobalFilterSection filters={filters} />
       <GlobalTable
         data={listData?.data}
