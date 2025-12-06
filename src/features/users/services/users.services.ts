@@ -10,7 +10,6 @@ export const useGetRoles = () => {
     url: API.roles.all,
     queryOptions: {
       select: (data: any) => {
-        console.log('Raw Roles Response:', data);
         return data?.data || data;
       }
     }
@@ -22,7 +21,6 @@ export const useGetPermissions = () => {
     url: API.permissions.list,
     queryOptions: {
       select: (data: any) => {
-        console.log('Raw Permissions Response:', data);
         return data?.data || data;
       }
     }
@@ -48,8 +46,10 @@ export const usePostUser = () => {
   return usePostData({
     url: API.users.store,
     refetchQueries: [API.users.list],
-    onSuccess: () => {
-      setOpen(null);
+    mutationOptions: {
+      onSuccess: () => {
+        setOpen(null);
+      }
     }
   });
 };
@@ -59,8 +59,10 @@ export const useDeleteUser = () => {
   return useDeleteData({
     url: API.users.list,
     refetchQueries: [API.users.list],
-    onSuccess: () => {
-      setOpen(null);
+    mutationOptions: {
+      onSuccess: () => {
+        setOpen(null);
+      }
     }
   });
 };

@@ -2,7 +2,7 @@
 
 import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
-import { DeleteModal } from '@/components/shared/comman-delete-model';
+import { DeleteModal } from '@/components/shared/common-delete-modal';
 import { useRoleStore } from '../store/role-store';
 import { useDeleteRole } from '../services/roles.services';
 

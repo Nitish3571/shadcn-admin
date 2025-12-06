@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Trash2 } from 'lucide-react';
 import { useUserStore } from '../store/user-store';
 import { useDeleteUser } from '../services/users.services';
-import { DeleteModal } from '@/components/shared/comman-delete-model';
+import { DeleteModal } from '@/components/shared/common-delete-modal';
 
 export function UserDeleteModal() {
   const { open, setOpen, currentRow } = useUserStore();

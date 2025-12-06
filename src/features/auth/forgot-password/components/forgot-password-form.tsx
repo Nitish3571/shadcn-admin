@@ -33,9 +33,8 @@ export function ForgotPasswordForm({ className, ...props }: ForgotFormProps) {
 
   function onSubmit(data: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
-
+    // TODO: Implement forgot password API call
+    
     setTimeout(() => {
       setIsLoading(false)
     }, 3000)
