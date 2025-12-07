@@ -13,12 +13,13 @@ import {
 import { AudioWaveform, Command, GalleryVerticalEnd } from 'lucide-react'
 import { type SidebarData } from '../types'
 import { useAuthStore } from '@/stores/authStore'
-
+import i18n from '@/i18n'
 
 const userData = useAuthStore.getState().userInfo;
 
 export const getSidebarData = (): SidebarData => {
   const hasPermission = useAuthStore.getState().hasPermission;
+  const t = i18n.t;
 
   return {
     user: {
@@ -45,71 +46,71 @@ export const getSidebarData = (): SidebarData => {
     ],
     navGroups: [
       {
-        title: 'General',
+        title: t('general'),
         items: [
           {
-            title: 'Dashboard',
+            title: t('dashboard'),
             url: '/' as const,
             icon: IconLayoutDashboard,
           },
           ...(hasPermission('users.view') ? [{
-            title: 'Users',
+            title: t('users'),
             url: '/users' as const,
             icon: IconUsers,
           }] : []),
           ...(hasPermission('roles.view') ? [{
-            title: 'Roles',
+            title: t('roles'),
             url: '/roles' as const,
             icon: IconUserCog,
           }] : [])
         ],
       },
       {
-        title: 'Other',
+        title: t('other'),
         items: [
           {
-            title: 'Settings',
+            title: t('settings'),
             icon: IconSettings,
             items: [
               {
-                title: 'Profile',
+                title: t('profile'),
                 url: '/settings',
                 icon: IconUserCog,
               },
               {
-                title: 'Account',
+                title: t('account'),
                 url: '/settings/account',
                 icon: IconTool,
               },
               {
-                title: 'Security',
+                title: t('security'),
                 url: '/settings/security',
                 icon: IconKey,
               },
               {
-                title: 'Appearance',
+                title: t('appearance'),
                 url: '/settings/appearance',
                 icon: IconPalette,
               },
               {
-                title: 'Notifications',
+                title: t('notifications'),
                 url: '/settings/notifications',
                 icon: IconNotification,
               },
               {
-                title: 'Display',
+                title: t('display'),
                 url: '/settings/display',
                 icon: IconBrowserCheck,
               },
             ],
           },
           ...(hasPermission('activity_logs.view') ? [{
-            title: 'Activity Logs',
+            title: t('activity_logs'),
             url: '/activity-logs' as const,
             icon: IconUserCog,
           }] : []),
           {
-            title: 'Help Center',
+            title: t('help_center'),
             url: '/help-center',
             icon: IconHelp,
           },

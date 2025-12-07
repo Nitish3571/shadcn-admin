@@ -32,23 +32,30 @@ export enum UserType {
 // Default user type for new users
 export const DEFAULT_USER_TYPE = UserType.USER;
 
+import i18n from '@/i18n';
+
 // Status Options for Dropdowns
-export const USER_STATUS_OPTIONS = [
-  { label: 'Active', value: String(UserStatus.ACTIVE) },
-  { label: 'Inactive', value: String(UserStatus.INACTIVE) },
-  { label: 'Invited', value: String(UserStatus.INVITED) },
-  { label: 'Suspended', value: String(UserStatus.SUSPENDED) },
+export const getUserStatusOptions = () => [
+  { label: i18n.t('active'), value: String(UserStatus.ACTIVE) },
+  { label: i18n.t('inactive'), value: String(UserStatus.INACTIVE) },
+  { label: i18n.t('invited'), value: String(UserStatus.INVITED) },
+  { label: i18n.t('suspended'), value: String(UserStatus.SUSPENDED) },
 ];
 
-export const USER_TYPE_OPTIONS = [
-  { label: 'Admin Account', value: String(UserType.ADMIN) },
-  { label: 'Regular User', value: String(UserType.USER) },
+export const getUserTypeOptions = () => [
+  { label: i18n.t('admin_account'), value: String(UserType.ADMIN) },
+  { label: i18n.t('regular_user'), value: String(UserType.USER) },
 ];
+
+// Legacy exports for backward compatibility
+export const USER_STATUS_OPTIONS = getUserStatusOptions();
+export const USER_TYPE_OPTIONS = getUserTypeOptions();
 
 // Helper functions
 export function getUserStatusLabel(status: number): string {
-  const option = USER_STATUS_OPTIONS.find(opt => opt.value === String(status));
-  return option?.label || 'Unknown';
+  const options = getUserStatusOptions();
+  const option = options.find(opt => opt.value === String(status));
+  return option?.label || i18n.t('unknown');
 }
 
 /**
@@ -56,8 +63,9 @@ export function getUserStatusLabel(status: number): string {
  * Note: This is for display only, not for access control
  */
 export function getUserTypeLabel(type: number): string {
-  const option = USER_TYPE_OPTIONS.find(opt => opt.value === String(type));
-  return option?.label || 'Unknown';
+  const options = getUserTypeOptions();
+  const option = options.find(opt => opt.value === String(type));
+  return option?.label || i18n.t('unknown');
 }
 
 export function isActiveStatus(status: number): boolean {

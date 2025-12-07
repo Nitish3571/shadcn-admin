@@ -10,10 +10,13 @@ import { NavUser } from '@/components/layout/nav-user'
 import { TeamSwitcher } from '@/components/layout/team-switcher'
 import { getSidebarData } from './data/sidebar-data'
 import { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  // Recalculate sidebar data when permissions change
-  const sidebarData = useMemo(() => getSidebarData(), [])
+  const { i18n } = useTranslation();
+  
+  // Recalculate sidebar data when language changes
+  const sidebarData = useMemo(() => getSidebarData(), [i18n.language])
   
   return (
     <Sidebar collapsible='icon' variant='sidebar' {...props}>

@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -33,6 +34,8 @@ export function DeleteModal({
   iconComponent,
   confirmButtonColor = "destructive",
 }: Readonly<DeleteModalProps>) {
+  const { t } = useTranslation();
+  
   const handleConfirm = () => {
     onConfirm();
   };
@@ -72,7 +75,7 @@ export function DeleteModal({
               disabled={loading}
               className="border-gray-300 text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
             >
-              Cancel
+              {String(t('cancel'))}
             </Button>
           </DialogClose>
 

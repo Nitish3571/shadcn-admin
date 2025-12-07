@@ -10,8 +10,10 @@ import { USER_STATUS_OPTIONS } from '@/types/enums'
 import { DataTablePage } from '@/components/shared/table/data-table-page'
 import { User } from './types/user.types'
 import { ExportButton } from '@/components/shared/export-button'
+import { useTranslation } from 'react-i18next'
 
 export default function Users() {
+  const { t } = useTranslation();
   const [params, setParams] = useState<{ page: number; limit: number; search: string; status?: string }>({ 
     page: 1, 
     limit: 10, 
@@ -45,14 +47,14 @@ export default function Users() {
       key: 'name', 
       value: params.search, 
       type: 'search', 
-      placeholder: 'Search by name...', 
+      placeholder: t('search_by_name'), 
       onChange: handleSearchChange 
     },
     { 
       key: 'status', 
       value: status, 
       type: 'select', 
-      placeholder: 'Search by status...', 
+      placeholder: t('filter_by_status'), 
       options: USER_STATUS_OPTIONS, 
       onChange: handleStatusChange 
     },
@@ -64,9 +66,9 @@ export default function Users() {
 
   return (
     <DataTablePage<User>
-      title="User List"
-      description="Manage your the user here"
-      buttonLabel={hasPermission('users.create') ? "Add User" : undefined}
+      title={t('user_list')}
+      description={t('manage_users')}
+      buttonLabel={hasPermission('users.create') ? t('add_user') : undefined}
       onButtonClick={hasPermission('users.create') ? handleUserAdd : undefined}
       data={listData}
       loading={loading}
@@ -77,10 +79,10 @@ export default function Users() {
       pageSize={params.limit}
       onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
-      emptyTitle="No users found"
-      emptyDescription="Start by adding your first user"
+      emptyTitle={t('no_users_found')}
+      emptyDescription={t('start_adding_users')}
       hasActiveFilters={!!(params.search || params.status)}
-      loadingText="Loading Users..."
+      loadingText={t('loading_users')}
       headerActions={
         <ExportButton
           endpoint="users/export"

@@ -9,9 +9,11 @@ import {
 } from '@tabler/icons-react'
 import { Link, Outlet, useLocation } from '@tanstack/react-router'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 export default function Settings() {
   const location = useLocation()
+  const { t } = useTranslation()
   
   const isActive = (href: string) => {
     if (href === '/settings') {
@@ -20,16 +22,49 @@ export default function Settings() {
     return location.pathname.startsWith(href)
   }
 
+  const sidebarNavItems = [
+    {
+      title: t('profile'),
+      icon: <IconUser size={18} />,
+      href: '/settings',
+    },
+    {
+      title: t('account'),
+      icon: <IconTool size={18} />,
+      href: '/settings/account',
+    },
+    {
+      title: t('security'),
+      icon: <IconKey size={18} />,
+      href: '/settings/security',
+    },
+    {
+      title: t('appearance'),
+      icon: <IconPalette size={18} />,
+      href: '/settings/appearance',
+    },
+    {
+      title: t('notifications'),
+      icon: <IconNotification size={18} />,
+      href: '/settings/notifications',
+    },
+    {
+      title: t('display'),
+      icon: <IconBrowserCheck size={18} />,
+      href: '/settings/display',
+    },
+  ]
+
   return (
     <PageLayout>
       <div className='space-y-6'>
         {/* Header */}
         <div className='space-y-1'>
           <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
-            Settings
+            {t('settings')}
           </h1>
           <p className='text-muted-foreground text-sm'>
-            Manage your account settings and preferences.
+            {t('manage_account_settings')}
           </p>
         </div>
         
@@ -62,36 +97,3 @@ export default function Settings() {
     </PageLayout>
   )
 }
-
-const sidebarNavItems = [
-  {
-    title: 'Profile',
-    icon: <IconUser size={18} />,
-    href: '/settings',
-  },
-  {
-    title: 'Account',
-    icon: <IconTool size={18} />,
-    href: '/settings/account',
-  },
-  {
-    title: 'Security',
-    icon: <IconKey size={18} />,
-    href: '/settings/security',
-  },
-  {
-    title: 'Appearance',
-    icon: <IconPalette size={18} />,
-    href: '/settings/appearance',
-  },
-  {
-    title: 'Notifications',
-    icon: <IconNotification size={18} />,
-    href: '/settings/notifications',
-  },
-  {
-    title: 'Display',
-    icon: <IconBrowserCheck size={18} />,
-    href: '/settings/display',
-  },
-]

@@ -9,8 +9,10 @@ import { usePermission } from '@/hooks/usePermission'
 import { DataTablePage } from '@/components/shared/table/data-table-page'
 import { Role } from './types/role.types'
 import { ExportButton } from '@/components/shared/export-button'
+import { useTranslation } from 'react-i18next'
 
 export default function Roles() {
+  const { t } = useTranslation();
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
 
   const { setOpen } = useRoleStore();
@@ -34,7 +36,7 @@ export default function Roles() {
       key: 'name', 
       value: params.search, 
       type: 'search', 
-      placeholder: 'Search by name...', 
+      placeholder: t('search_by_name'), 
       onChange: handleSearchChange 
     },
   ]
@@ -45,9 +47,9 @@ export default function Roles() {
 
   return (
     <DataTablePage<Role>
-      title="Role List"
-      description="Manage your the role here"
-      buttonLabel={hasPermission('roles.create') ? "Add Role" : undefined}
+      title={t('role_list')}
+      description={t('manage_roles')}
+      buttonLabel={hasPermission('roles.create') ? t('add_role') : undefined}
       onButtonClick={hasPermission('roles.create') ? handleRoleAdd : undefined}
       data={listData}
       loading={loading}
@@ -58,10 +60,10 @@ export default function Roles() {
       pageSize={params.limit}
       onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
-      emptyTitle="No roles found"
-      emptyDescription="Start by adding your first role"
+      emptyTitle={t('no_roles_found')}
+      emptyDescription={t('start_adding_roles')}
       hasActiveFilters={!!params.search}
-      loadingText="Loading Roles..."
+      loadingText={t('loading_roles')}
       headerActions={
         <ExportButton
           endpoint="roles/export"

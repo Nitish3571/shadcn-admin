@@ -1,8 +1,9 @@
 ﻿import { z } from 'zod';
+import i18n from '@/i18n';
 
 export const roleFormSchema = z.object({
-  name: z.string().min(2, { message: 'Role name must be at least 2 characters.' }),
-  permissions: z.array(z.string()).min(1, { message: 'At least one permission must be selected.' }),
+  name: z.string().min(2, { message: i18n.t('role_name_min_2_chars') }),
+  permissions: z.array(z.string()).min(1, { message: i18n.t('at_least_one_permission') }),
   isEdit: z.boolean().default(false),
 });
 

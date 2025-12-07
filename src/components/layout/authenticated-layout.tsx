@@ -11,6 +11,7 @@ import { Header } from './header'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '../theme-switch'
 import { ProfileDropdown } from '../profile-dropdown'
+import { LanguageSwitcher } from '@/components/shared/language-switcher'
 import { sidebarData } from './data/sidebar-data'
 
 interface Props {
@@ -52,6 +53,7 @@ export function AuthenticatedLayout({ children }: Props) {
             <Header fixed>
               <Search />
               <div className='ml-auto flex items-center space-x-4'>
+                <LanguageSwitcher />
                 <ThemeSwitch />
                 <ProfileDropdown user={sidebarData.user} />
               </div>

@@ -5,6 +5,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import UserListActions from "../actions/user-actions";
 import { User } from "../types/user.types";
+import i18n from '@/i18n';
 
 // 🔠 Helper to capitalize first letter
 const capitalize = (str: string) =>
@@ -52,7 +53,7 @@ export const generateDynamicColumns = (
             const roles = row.original.roles || [];
 
             if (!roles.length)
-              return <span className="text-gray-400">No roles</span>;
+              return <span className="text-gray-400">{i18n.t('no_roles_available')}</span>;
 
             return (
               <div className="flex flex-wrap gap-1">
@@ -100,7 +101,7 @@ export const generateDynamicColumns = (
                     isActive ? "bg-green-500" : "bg-red-500"
                   )}
                 ></span>
-                {isActive ? "Active" : "Inactive"}
+                {isActive ? i18n.t('active') : i18n.t('inactive')}
               </Badge>
             );
           };
@@ -119,7 +120,7 @@ export const generateDynamicColumns = (
   // ACTIONS column
   dynamicColumns.push({
     id: "actions",
-    header: "Actions",
+    header: i18n.t('actions'),
     enableSorting: false,
     cell: ({ row }) => <UserListActions user={row.original} />,
   });
@@ -133,7 +134,7 @@ export const generateDynamicColumns = (
 const getDefaultColumns = (): ColumnDef<User>[] => [
   {
     accessorKey: "name",
-    header: "Name",
+    header: i18n.t('name'),
     enableSorting: true,
     cell: ({ row }) => (
       <div className="flex flex-col">
@@ -144,11 +145,11 @@ const getDefaultColumns = (): ColumnDef<User>[] => [
   },
   {
     accessorKey: "roles",
-    header: "Roles",
+    header: i18n.t('roles'),
     enableSorting: false,
     cell: ({ row }) => {
       const roles = row.original.roles || [];
-      if (!roles.length) return <span className="text-gray-400">No roles</span>;
+      if (!roles.length) return <span className="text-gray-400">{i18n.t('no_roles_available')}</span>;
 
       return (
         <div className="flex flex-wrap gap-1">
@@ -163,7 +164,7 @@ const getDefaultColumns = (): ColumnDef<User>[] => [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: i18n.t('status'),
     enableSorting: true,
     cell: ({ row }) => {
       const isActive = row.original.status === 1;
@@ -182,14 +183,14 @@ const getDefaultColumns = (): ColumnDef<User>[] => [
               isActive ? "bg-green-500" : "bg-red-500"
             )}
           ></span>
-          {isActive ? "Active" : "Inactive"}
+          {isActive ? i18n.t('active') : i18n.t('inactive')}
         </Badge>
       );
     },
   },
   {
     id: "actions",
-    header: "Actions",
+    header: i18n.t('actions'),
     enableSorting: false,
     cell: ({ row }) => <UserListActions user={row.original} />,
   },

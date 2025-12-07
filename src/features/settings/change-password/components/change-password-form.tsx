@@ -16,6 +16,8 @@ import {
 import { PasswordInput } from '@/components/password-input'
 import { useChangePassword } from '../services/change-password.hooks'
 import { toast } from 'sonner'
+import i18n from '@/i18n'
+import { useTranslation } from 'react-i18next'
 
 type ChangePasswordFormProps = HTMLAttributes<HTMLFormElement>
 
@@ -23,23 +25,24 @@ const formSchema = z
   .object({
     current_password: z
       .string()
-      .min(1, { message: 'Please enter your current password' }),
+      .min(1, { message: i18n.t('current_password_required') }),
     password: z
       .string()
-      .min(1, { message: 'Please enter your new password' })
-      .min(8, { message: 'Password must be at least 8 characters long' }),
+      .min(1, { message: i18n.t('new_password_required') })
+      .min(8, { message: i18n.t('password_min_8_chars') }),
     password_confirmation: z.string(),
   })
   .refine((data) => data.password === data.password_confirmation, {
-    message: "Passwords don't match.",
+    message: i18n.t('passwords_dont_match'),
     path: ['password_confirmation'],
   })
   .refine((data) => data.current_password !== data.password, {
-    message: "New password must be different from current password.",
+    message: i18n.t('new_password_must_differ'),
     path: ['password'],
   })
 
 export function ChangePasswordForm({ className, ...props }: ChangePasswordFormProps) {
+  const { t } = useTranslation()
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -54,7 +57,7 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
   const { mutate: changePassword } = useChangePassword({
     onSuccess: () => {
       setIsLoading(false)
-      toast.success('Password changed successfully!')
+      toast.success(t('password_changed_successfully'))
       form.reset()
     },
     onError: (error: any) => {
@@ -62,7 +65,7 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
       const errorMsg = 
         error?.response?.data?.message || 
         error?.response?.data?.errors?.current_password?.[0] ||
-        'Failed to change password. Please try again.'
+        t('failed_to_change_password')
       toast.error(errorMsg)
     },
   })
@@ -84,12 +87,12 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
           name='current_password'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Current Password</FormLabel>
+              <FormLabel>{t('current_password')}</FormLabel>
               <FormControl>
-                <PasswordInput placeholder='Enter current password' {...field} />
+                <PasswordInput placeholder={t('enter_current_password')} {...field} />
               </FormControl>
               <FormDescription>
-                Enter your current password to verify your identity
+                {t('enter_current_password_verify')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -100,12 +103,12 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
           name='password'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel>{t('new_password')}</FormLabel>
               <FormControl>
-                <PasswordInput placeholder='Enter new password' {...field} />
+                <PasswordInput placeholder={t('enter_new_password')} {...field} />
               </FormControl>
               <FormDescription>
-                Password must be at least 8 characters long and different from your current password
+                {t('password_requirements')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -116,12 +119,12 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
           name='password_confirmation'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm New Password</FormLabel>
+              <FormLabel>{t('confirm_new_password')}</FormLabel>
               <FormControl>
-                <PasswordInput placeholder='Confirm new password' {...field} />
+                <PasswordInput placeholder={t('confirm_new_password')} {...field} />
               </FormControl>
               <FormDescription>
-                Re-enter your new password to confirm
+                {t('reenter_new_password')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -129,7 +132,7 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
         />
         <div className='flex gap-3 pt-4'>
           <Button type='submit' disabled={isLoading}>
-            {isLoading ? 'Updating...' : 'Update Password'}
+            {isLoading ? t('updating') : t('update_password')}
           </Button>
           <Button
             type='button'
@@ -137,7 +140,7 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
             onClick={() => form.reset()}
             disabled={isLoading}
           >
-            Cancel
+            {t('cancel')}
           </Button>
         </div>
       </form>

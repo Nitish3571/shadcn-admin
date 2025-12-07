@@ -7,6 +7,7 @@ import { FilterConfig } from '@/components/shared/table/filter-toolbar';
 import { GlobalTable } from '@/components/shared/table/global-table';
 import GlobalFilterSection from '@/components/shared/table/global-table-filters';
 import GlobalLoader from '@/components/shared/global-loader';
+import { useTranslation } from '@/hooks/useTranslation';
 
 interface DataTablePageProps<TData> {
   // Header props
@@ -41,6 +42,11 @@ interface DataTablePageProps<TData> {
   // Loading text
   loadingText?: string;
   
+  // Translation keys (optional - will use defaults if not provided)
+  emptyTitleKey?: string;
+  emptyDescriptionKey?: string;
+  loadingTextKey?: string;
+  
   // Additional content (modals, etc.)
   children?: ReactNode;
 }
@@ -60,12 +66,17 @@ export function DataTablePage<TData>({
   pageSize,
   onPageChange,
   onPageSizeChange,
-  emptyTitle = 'No data found',
+  emptyTitle,
   emptyDescription,
   hasActiveFilters = false,
-  loadingText = 'Loading...',
+  loadingText,
+  emptyTitleKey,
+  emptyDescriptionKey,
+  loadingTextKey,
   children,
 }: DataTablePageProps<TData>) {
+  const { t } = useTranslation();
+  
   // Track if we've ever loaded data to prevent full-page loader on subsequent loads
   const hasLoadedOnce = useRef(false);
   
@@ -89,8 +100,13 @@ export function DataTablePage<TData>({
   // Show full-page loader only on true initial load (never loaded before)
   const isInitialLoad = loading && !hasLoadedOnce.current;
   
+  const finalLoadingText = loadingText || (loadingTextKey ? String(t(loadingTextKey)) : String(t('loading')));
+  const finalEmptyTitle = emptyTitle || (emptyTitleKey ? String(t(emptyTitleKey)) : String(t('no_data_found')));
+  const finalEmptyDescription = emptyDescription || (emptyDescriptionKey ? String(t(emptyDescriptionKey)) : 
+    (hasActiveFilters ? String(t('try_adjusting_filters')) : ''));
+  
   if (isInitialLoad) {
-    return <GlobalLoader text={loadingText} />;
+    return <GlobalLoader text={finalLoadingText} />;
   }
   
   if (error) {
@@ -98,7 +114,7 @@ export function DataTablePage<TData>({
       <PageLayout>
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <p className="text-red-500 font-semibold">Error loading data</p>
+            <p className="text-red-500 font-semibold">{String(t('error'))}</p>
             <p className="text-gray-600 mt-2">{error.message}</p>
           </div>
         </div>
@@ -107,9 +123,6 @@ export function DataTablePage<TData>({
   }
 
   const isEmpty = !listData?.data || listData.data.length === 0;
-  const defaultEmptyDescription = hasActiveFilters 
-    ? 'Try adjusting your filters' 
-    : emptyDescription || 'Start by adding your first item';
 
   return (
     <PageLayout>
@@ -145,8 +158,8 @@ export function DataTablePage<TData>({
       {!loading && isEmpty ? (
         <div className="flex items-center justify-center h-96">
           <div className="text-center">
-            <p className="text-gray-500 font-semibold">{emptyTitle}</p>
-            <p className="text-gray-400 mt-2">{defaultEmptyDescription}</p>
+            <p className="text-gray-500 font-semibold">{finalEmptyTitle}</p>
+            {finalEmptyDescription && <p className="text-gray-400 mt-2">{finalEmptyDescription}</p>}
           </div>
         </div>
       ) : (

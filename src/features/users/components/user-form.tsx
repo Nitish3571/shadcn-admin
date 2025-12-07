@@ -33,8 +33,9 @@ import { PermissionsManager } from './PermissionsManager';
 import { userFormSchema, UserFormSchema } from '../schema/user-schema';
 import { useGetRoles, useGetPermissions, useGetUserById, usePostUser } from '../services/users.services';
 import { useUserStore } from '../store/user-store';
-import { DEFAULT_USER_TYPE } from '@/types/enums';
+import { DEFAULT_USER_TYPE, getUserStatusOptions } from '@/types/enums';
 import { useAuthStore } from '@/stores/authStore';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const formatDateForInput = (dateString?: string): string => {
   if (!dateString) return '';
@@ -60,6 +61,7 @@ const normalizePermissionName = (name: string) => {
 };
 
 export function UserForm() {
+  const { t } = useTranslation();
   const { open, setOpen, currentRow } = useUserStore();
   const userInfo = useAuthStore((state) => state.userInfo);
   const hasPermission = useAuthStore((state) => state.hasPermission);
@@ -273,13 +275,13 @@ export function UserForm() {
 
     saveUser(formData, {
       onSuccess: async (data: any) => {
-        toast.success(isEdit ? 'User updated successfully!' : 'User created successfully!');
+        toast.success(isEdit ? t('user_updated_successfully') : t('user_created_successfully'));
         
         // If editing current user, refresh their permissions instantly
         const updatedUserId = data?.data?.data?.[0]?.id || currentRow?.id;
         if (updatedUserId === userInfo?.id) {
           await refreshUserInfo();
-          toast.info('Your permissions have been updated!');
+          toast.info(t('permissions_updated'));
         }
         
         setOpen(null);
@@ -291,7 +293,7 @@ export function UserForm() {
         setSelectedRoles([]);
       },
       onError: (error: any) => {
-        toast.error(error?.message || (isEdit ? 'Failed to update user' : 'Failed to create user'));
+        toast.error(error?.message || (isEdit ? t('failed_to_update_user') : t('failed_to_create_user')));
       },
     });
   };
@@ -384,7 +386,7 @@ export function UserForm() {
     );
   }
 
-  const dialogTitle = isView ? 'View User' : isEdit ? 'Edit User' : 'Add New User';
+  const dialogTitle = isView ? t('view_user') : isEdit ? t('edit_user') : t('add_new_user');
 
   return (
     <Dialog
@@ -406,10 +408,10 @@ export function UserForm() {
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
             {isView
-              ? 'View user details below.'
+              ? t('view_user_details')
               : isEdit
-              ? 'Update the user details below.'
-              : 'Fill in the details to create a new user.'}
+              ? t('update_user_details')
+              : t('fill_details_create_user')}
           </DialogDescription>
         </DialogHeader>
 
@@ -417,19 +419,19 @@ export function UserForm() {
           <form id="user-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="basic" className="space-y-4">
               <TabsList>
-                <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                {canManageRoles && <TabsTrigger value="rights">Rights</TabsTrigger>}
+                <TabsTrigger value="basic">{t('basic_info')}</TabsTrigger>
+                {canManageRoles && <TabsTrigger value="rights">{t('rights')}</TabsTrigger>}
               </TabsList>
 
               {/* ----------------- BASIC INFO TAB ----------------- */}
               <TabsContent value="basic" className="p-0">
                 {/* Avatar Upload */}
                 <div className="space-y-4 p-4 border rounded-md">
-                  <h3 className="text-sm font-medium text-gray-700">Profile Picture</h3>
+                  <h3 className="text-sm font-medium text-gray-700">{t('profile_picture')}</h3>
                   <div className="flex items-center gap-4">
                     {avatarPreview && (
                       <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200">
-                        <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
+                        <img src={avatarPreview} alt={t('avatar_preview')} className="w-full h-full object-cover" />
                       </div>
                     )}
                     {!isView && (
@@ -441,7 +443,7 @@ export function UserForm() {
                           disabled={isDisabled}
                           className="cursor-pointer"
                         />
-                        <p className="text-xs text-gray-500 mt-1">Max size: 2MB. Formats: JPEG, PNG, JPG, GIF</p>
+                        <p className="text-xs text-gray-500 mt-1">{t('max_size_formats')}</p>
                       </div>
                     )}
                   </div>
@@ -449,16 +451,16 @@ export function UserForm() {
 
                 {/* User Information */}
                 <div className="space-y-4 p-4 border rounded-md">
-                  <h3 className="text-sm font-medium text-gray-700">User Information</h3>
+                  <h3 className="text-sm font-medium text-gray-700">{t('user_information')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
                       name="name"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name</FormLabel>
+                          <FormLabel>{t('full_name')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="John Doe" disabled={isDisabled} {...field} />
+                            <Input placeholder={t('john_doe')} disabled={isDisabled} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -470,9 +472,9 @@ export function UserForm() {
                       name="email"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email</FormLabel>
+                          <FormLabel>{t('email')}</FormLabel>
                           <FormControl>
-                            <Input type="email" placeholder="john@example.com" disabled={isDisabled} {...field} />
+                            <Input type="email" placeholder={t('john_example_email')} disabled={isDisabled} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -484,9 +486,9 @@ export function UserForm() {
                       name="phone"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Phone</FormLabel>
+                          <FormLabel>{t('phone')}</FormLabel>
                           <FormControl>
-                            <Input placeholder="+1234567890" disabled={isDisabled} {...field} />
+                            <Input placeholder={t('phone_placeholder')} disabled={isDisabled} {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -498,7 +500,7 @@ export function UserForm() {
                       name="status"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Status</FormLabel>
+                          <FormLabel>{t('status')}</FormLabel>
                           <Select
                             onValueChange={(value) => field.onChange(Number(value))}
                             value={String(field.value)}
@@ -506,12 +508,15 @@ export function UserForm() {
                           >
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select status" />
+                                <SelectValue placeholder={t('select_status')} />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="1">Active</SelectItem>
-                              <SelectItem value="2">Inactive</SelectItem>
+                              {getUserStatusOptions().map((option) => (
+                                <SelectItem key={option.value} value={option.value}>
+                                  {option.label}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -524,7 +529,7 @@ export function UserForm() {
                       name="date_of_birth"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Date of Birth</FormLabel>
+                          <FormLabel>{t('date_of_birth')}</FormLabel>
                           <FormControl>
                             <Input type="date" disabled={isDisabled} {...field} />
                           </FormControl>
@@ -539,9 +544,9 @@ export function UserForm() {
                     name="bio"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Bio</FormLabel>
+                        <FormLabel>{t('bio')}</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Write something about the user" disabled={isDisabled} {...field} />
+                          <Textarea placeholder={t('write_about_user')} disabled={isDisabled} {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -552,18 +557,18 @@ export function UserForm() {
                 {/* Password Section */}
                 {!isView && (
                   <div className="space-y-4 p-4 border rounded-md">
-                    <h3 className="text-sm font-medium text-gray-700">{isEdit ? 'Change Password (Optional)' : 'Password'}</h3>
+                    <h3 className="text-sm font-medium text-gray-700">{isEdit ? t('change_password_optional') : t('password')}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Password</FormLabel>
+                            <FormLabel>{t('password')}</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
-                                placeholder={isEdit ? 'Leave blank to keep current' : 'Enter password'}
+                                placeholder={isEdit ? t('leave_blank_keep_current') : t('enter_password')}
                                 disabled={isDisabled}
                                 {...field}
                               />
@@ -578,9 +583,9 @@ export function UserForm() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Confirm Password</FormLabel>
+                            <FormLabel>{t('confirm_password')}</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Confirm password" disabled={isDisabled} {...field} />
+                              <Input type="password" placeholder={t('confirm_password')} disabled={isDisabled} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -595,10 +600,10 @@ export function UserForm() {
               {canManageRoles && (
               <TabsContent value="rights" className="p-0">
                 <div className="space-y-4 p-4 border rounded-md">
-                  <h3 className="text-sm font-medium text-gray-700">Roles</h3>
+                  <h3 className="text-sm font-medium text-gray-700">{t('roles')}</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {roles.length === 0 ? (
-                      <p className="text-sm text-gray-500">No roles available. Loading...</p>
+                      <p className="text-sm text-gray-500">{t('no_roles_available')}</p>
                     ) : (
                       roles.map((role) => (
                         <div key={role.id} className="flex items-center space-x-2">
@@ -620,7 +625,7 @@ export function UserForm() {
                 <div className="space-y-4 p-4 border rounded-md">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700">Permissions</h3>
+                      <h3 className="text-sm font-medium text-gray-700">{t('permissions')}</h3>
                     </div>
                   </div>
                   <PermissionsManager
@@ -645,11 +650,11 @@ export function UserForm() {
         {!isView && (
           <DialogFooter>
             <Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(null)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={saving} form="user-form">
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Update User' : 'Create User'}
+              {isEdit ? t('update_user') : t('create_user')}
             </Button>
           </DialogFooter>
         )}

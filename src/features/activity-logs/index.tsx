@@ -7,8 +7,10 @@ import { ActivityLogDeleteModal } from './components/activity-log-delete-modal';
 import { DataTablePage } from '@/components/shared/table/data-table-page';
 import { ActivityLog, LOG_NAME_OPTIONS, EVENT_OPTIONS } from './types/activity-log.types';
 import { ExportButton } from '@/components/shared/export-button';
+import { useTranslation } from 'react-i18next';
 
 export default function ActivityLogs() {
+  const { t } = useTranslation();
   const [params, setParams] = useState<{
     page: number;
     limit: number;
@@ -68,14 +70,14 @@ export default function ActivityLogs() {
       key: 'search',
       value: params.search,
       type: 'search',
-      placeholder: 'Search activity logs...',
+      placeholder: t('search_activity_logs'),
       onChange: handleSearchChange,
     },
     {
       key: 'log_name',
       value: logName,
       type: 'select',
-      placeholder: 'Filter by type...',
+      placeholder: t('filter_by_type'),
       options: LOG_NAME_OPTIONS,
       onChange: handleLogNameChange,
     },
@@ -83,7 +85,7 @@ export default function ActivityLogs() {
       key: 'event',
       value: event,
       type: 'select',
-      placeholder: 'Filter by event...',
+      placeholder: t('filter_by_event'),
       options: EVENT_OPTIONS,
       onChange: handleEventChange,
     },
@@ -91,8 +93,8 @@ export default function ActivityLogs() {
 
   return (
     <DataTablePage<ActivityLog>
-      title="Activity Logs"
-      description="View and manage system activity logs"
+      title={t('activity_logs')}
+      description={t('manage_activity_logs')}
       data={listData}
       loading={loading}
       error={error}
@@ -102,10 +104,10 @@ export default function ActivityLogs() {
       pageSize={params.limit}
       onPageChange={handlePageChange}
       onPageSizeChange={handlePageSizeChange}
-      emptyTitle="No activity logs found"
-      emptyDescription="Activity logs will appear here as users interact with the system"
+      emptyTitle={t('no_activity_logs_found')}
+      emptyDescription={t('activity_logs_description')}
       hasActiveFilters={!!(params.search || params.log_name || params.event)}
-      loadingText="Loading Activity Logs..."
+      loadingText={t('loading_activity_logs')}
       headerActions={
         <ExportButton
           endpoint="activity-logs/export"

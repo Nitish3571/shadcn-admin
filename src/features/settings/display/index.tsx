@@ -1,11 +1,14 @@
 import ContentSection from '../components/content-section'
 import { DisplayForm } from './display-form'
+import { useTranslation } from 'react-i18next'
 
 export default function SettingsDisplay() {
+  const { t } = useTranslation()
+  
   return (
     <ContentSection
-      title='Display'
-      desc="Turn items on or off to control what's displayed in the app."
+      title={t('display')}
+      desc={t('display_description')}
     >
       <DisplayForm />
     </ContentSection>

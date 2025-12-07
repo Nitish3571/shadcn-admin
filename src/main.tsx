@@ -1,6 +1,7 @@
 ﻿import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { AxiosError } from 'axios'
+import './i18n' // Initialize i18n
 import {
   QueryCache,
   QueryClient,

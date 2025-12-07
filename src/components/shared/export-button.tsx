@@ -8,6 +8,7 @@ import {
 import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { useExport } from '@/hooks/useExport';
 import { useAuthStore } from '@/stores/authStore';
+import { useTranslation } from 'react-i18next';
 
 interface ExportButtonProps {
   endpoint: string;
@@ -28,6 +29,7 @@ export function ExportButton({
 }: ExportButtonProps) {
   const { exportData, isExporting } = useExport();
   const hasPermission = useAuthStore((state) => state.hasPermission);
+  const { t } = useTranslation();
 
   // Don't render if user doesn't have permission
   if (!hasPermission(permission)) {
@@ -48,21 +50,21 @@ export function ExportButton({
       <DropdownMenuTrigger asChild>
         <Button variant={variant} size={size} disabled={isExporting}>
           <Download className="mr-2 h-4 w-4" />
-          {isExporting ? 'Exporting...' : 'Export'}
+          {isExporting ? t('exporting') : t('export')}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handleExport('xlsx')}>
           <FileSpreadsheet className="mr-2 h-4 w-4" />
-          Export as Excel (.xlsx)
+          {t('export_excel')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleExport('csv')}>
           <FileText className="mr-2 h-4 w-4" />
-          Export as CSV (.csv)
+          {t('export_csv')}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handleExport('xls')}>
           <FileSpreadsheet className="mr-2 h-4 w-4" />
-          Export as Excel 97-2003 (.xls)
+          {t('export_xls')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

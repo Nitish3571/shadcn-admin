@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { ColumnDef } from '@tanstack/react-table';
 import RoleListActions from '../actions/role-actions';
 import { Role } from '../types/role.types';
+import i18n from '@/i18n';
 
 const capitalize = (str: string) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
@@ -42,7 +43,7 @@ export const generateDynamicColumns = (
             const permissions = row.original.permissions || [];
 
             if (!permissions.length)
-              return <span className='text-gray-400'>No permissions</span>;
+              return <span className='text-gray-400'>{i18n.t('no_permissions')}</span>;
 
             return (
               <div className='flex flex-wrap gap-1'>
@@ -50,7 +51,7 @@ export const generateDynamicColumns = (
                   variant='secondary'
                   className='py-1 px-2 text-xs font-medium'
                 >
-                  {permissions.length} permission{permissions.length !== 1 ? 's' : ''}
+                  {permissions.length} {i18n.t('permission')}{permissions.length !== 1 ? 's' : ''}
                 </Badge>
               </div>
             );
@@ -69,7 +70,7 @@ export const generateDynamicColumns = (
 
   dynamicColumns.push({
     id: 'actions',
-    header: 'Actions',
+    header: i18n.t('actions'),
     enableSorting: false,
     cell: ({ row }) => <RoleListActions role={row.original} />,
   });
@@ -80,7 +81,7 @@ export const generateDynamicColumns = (
 const getDefaultColumns = (): ColumnDef<Role>[] => [
   {
     accessorKey: 'name',
-    header: 'Role Name',
+    header: i18n.t('role_name'),
     enableSorting: true,
     cell: ({ row }) => (
       <div className='flex flex-col'>
@@ -92,17 +93,17 @@ const getDefaultColumns = (): ColumnDef<Role>[] => [
   },
   {
     accessorKey: 'permissions',
-    header: 'Permissions',
+    header: i18n.t('permissions'),
     enableSorting: false,
     cell: ({ row }) => {
       const permissions = row.original.permissions || [];
       if (!permissions.length)
-        return <span className='text-gray-400'>No permissions</span>;
+        return <span className='text-gray-400'>{i18n.t('no_permissions')}</span>;
 
       return (
         <div className='flex flex-wrap gap-1'>
           <Badge variant='secondary' className='py-1 px-2 text-xs font-medium'>
-            {permissions.length} permission{permissions.length !== 1 ? 's' : ''}
+            {permissions.length} {i18n.t('permission')}{permissions.length !== 1 ? 's' : ''}
           </Badge>
         </div>
       );
@@ -110,7 +111,7 @@ const getDefaultColumns = (): ColumnDef<Role>[] => [
   },
   {
     id: 'actions',
-    header: 'Actions',
+    header: i18n.t('actions'),
     enableSorting: false,
     cell: ({ row }) => <RoleListActions role={row.original} />,
   },

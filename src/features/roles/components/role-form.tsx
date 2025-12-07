@@ -21,6 +21,7 @@ import { PermissionsManager } from './permissions-list';
 import { roleFormSchema, RoleFormSchema } from '../schema/role-schema';
 import { useGetPermissions, useGetRoleById, usePostRole } from '../services/roles.services';
 import { useRoleStore } from '../store/role-store';
+import { useTranslation } from '@/hooks/useTranslation';
 
 type ApiPermission = { id: number; name: string; description?: string };
 type PermissionModule = { module: { id: number | null; name: string; slug?: string | null }; permissions: ApiPermission[] };
@@ -28,6 +29,7 @@ type PermissionModule = { module: { id: number | null; name: string; slug?: stri
 const normalizePermissionName = (name: string) => name.toLowerCase().replace(/_/g, '.');
 
 export function RoleForm() {
+  const { t } = useTranslation();
   const { open, setOpen, currentRow } = useRoleStore();
   const isEdit = open === 'edit';
   const isView = open === 'view';
@@ -99,13 +101,13 @@ export function RoleForm() {
 
     saveRole(formData, {
       onSuccess: () => {
-        toast.success(isEdit ? 'Role updated successfully!' : 'Role created successfully!');
+        toast.success(isEdit ? t('role_updated_successfully') : t('role_created_successfully'));
         setOpen(null);
         form.reset();
         setSelectedPermissions([]);
       },
       onError: (error: any) => {
-        toast.error(error?.message || (isEdit ? 'Failed to update role' : 'Failed to create role'));
+        toast.error(error?.message || (isEdit ? t('failed_to_update_role') : t('failed_to_create_role')));
       },
     });
   };
@@ -138,7 +140,7 @@ export function RoleForm() {
     );
   }
 
-  const dialogTitle = isView ? 'View Role' : isEdit ? 'Edit Role' : 'Add New Role';
+  const dialogTitle = isView ? t('view_role') : isEdit ? t('edit_role') : t('add_new_role');
 
   return (
     <Dialog open={!!open} onOpenChange={() => setOpen(null)}>
@@ -146,7 +148,7 @@ export function RoleForm() {
         <DialogHeader>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
-            {isView ? 'View role details below.' : isEdit ? 'Update the role details below.' : 'Fill in the details to create a new role.'}
+            {isView ? t('view_role_details') : isEdit ? t('update_role_details') : t('fill_details_create_role')}
           </DialogDescription>
         </DialogHeader>
 
@@ -158,9 +160,9 @@ export function RoleForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Role Name</FormLabel>
+                    <FormLabel>{t('role_name')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter role name" disabled={isDisabled} {...field} />
+                      <Input placeholder={t('enter_role_name')} disabled={isDisabled} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -169,7 +171,7 @@ export function RoleForm() {
             </div>
 
             <div className="space-y-4 p-4 border rounded-md">
-              <h3 className="text-sm font-medium text-gray-700">Permissions</h3>
+              <h3 className="text-sm font-medium text-gray-700">{t('permissions')}</h3>
               <PermissionsManager
                 modules={normalizedModules}
                 selectedPermissions={selectedPermissions}
@@ -187,11 +189,11 @@ export function RoleForm() {
         {!isView && (
           <DialogFooter>
             <Button type="button" variant="outline" disabled={saving} onClick={() => setOpen(null)}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button type="submit" disabled={saving} form="role-form">
               {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isEdit ? 'Update Role' : 'Create Role'}
+              {isEdit ? t('update_role') : t('create_role')}
             </Button>
           </DialogFooter>
         )}

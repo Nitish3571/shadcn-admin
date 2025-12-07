@@ -1,5 +1,6 @@
 import { AxiosError } from 'axios';
 import { toast } from 'sonner';
+import i18n from '@/i18n';
 
 interface ApiErrorResponse {
   message?: string;
@@ -18,7 +19,7 @@ export function handleApiError(error: unknown): string {
     console.error('API Error:', error);
   }
 
-  let errorMessage = 'Something went wrong. Please try again.';
+  let errorMessage = i18n.t('something_went_wrong_try_again');
 
   // Handle Axios errors
   if (error instanceof AxiosError) {
@@ -42,22 +43,22 @@ export function handleApiError(error: unknown): string {
     // Handle specific status codes
     switch (error.response?.status) {
       case 401:
-        errorMessage = 'Unauthorized. Please login again.';
+        errorMessage = i18n.t('unauthorized_login_again');
         break;
       case 403:
-        errorMessage = 'You do not have permission to perform this action.';
+        errorMessage = i18n.t('no_permission_action');
         break;
       case 404:
-        errorMessage = 'The requested resource was not found.';
+        errorMessage = i18n.t('resource_not_found');
         break;
       case 422:
-        errorMessage = response?.message || 'Validation failed. Please check your input.';
+        errorMessage = response?.message || i18n.t('validation_failed_check_input');
         break;
       case 500:
-        errorMessage = 'Server error. Please try again later.';
+        errorMessage = i18n.t('server_error_try_later');
         break;
       case 503:
-        errorMessage = 'Service temporarily unavailable. Please try again later.';
+        errorMessage = i18n.t('service_unavailable_try_later');
         break;
     }
   }
@@ -65,7 +66,7 @@ export function handleApiError(error: unknown): string {
   // Handle network errors
   if (error instanceof Error) {
     if (error.message === 'Network Error') {
-      errorMessage = 'Network error. Please check your internet connection.';
+      errorMessage = i18n.t('network_error_check_connection');
     } else if (!error.message.includes('API')) {
       errorMessage = error.message;
     }

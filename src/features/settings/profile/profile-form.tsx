@@ -20,14 +20,16 @@ import { useUpdateProfile } from './services/profile.services'
 import { toast } from 'sonner'
 import { IconUpload, IconX } from '@tabler/icons-react'
 
+import i18n from '@/i18n'
+
 const profileFormSchema = z.object({
   name: z
     .string()
-    .min(2, { message: 'Name must be at least 2 characters.' })
-    .max(255, { message: 'Name must not be longer than 255 characters.' }),
-  phone: z.string().max(20, { message: 'Phone must not exceed 20 characters.' }).optional().nullable(),
+    .min(2, { message: i18n.t('name_min_2_chars') })
+    .max(255, { message: i18n.t('name_max_255_chars') }),
+  phone: z.string().max(20, { message: i18n.t('phone_max_20_chars') }).optional().nullable(),
   date_of_birth: z.string().optional().nullable(),
-  bio: z.string().max(500, { message: 'Bio must not exceed 500 characters.' }).optional().nullable(),
+  bio: z.string().max(500, { message: i18n.t('bio_max_500_chars') }).optional().nullable(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -63,14 +65,14 @@ export default function ProfileForm() {
   const { mutate: updateProfile } = useUpdateProfile({
     onSuccess: () => {
       setIsLoading(false)
-      toast.success('Profile updated successfully!')
+      toast.success(i18n.t('profile_updated_successfully'))
       refreshUserInfo()
       setAvatarFile(null)
       setAvatarPreview(null)
     },
     onError: (error: any) => {
       setIsLoading(false)
-      const errorMsg = error?.response?.data?.message || 'Failed to update profile'
+      const errorMsg = error?.response?.data?.message || i18n.t('failed_to_update_profile')
       toast.error(errorMsg)
     },
   })
@@ -79,11 +81,11 @@ export default function ProfileForm() {
     const file = e.target.files?.[0]
     if (file) {
       if (file.size > 2048 * 1024) {
-        toast.error('Avatar size must not exceed 2MB')
+        toast.error(i18n.t('avatar_size_error'))
         return
       }
       if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(file.type)) {
-        toast.error('Avatar must be an image (jpeg, jpg, png, gif)')
+        toast.error(i18n.t('avatar_format_error'))
         return
       }
       setAvatarFile(file)
@@ -121,7 +123,7 @@ export default function ProfileForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
         {/* Avatar Upload */}
         <div className='space-y-2'>
-          <FormLabel>Profile Picture</FormLabel>
+          <FormLabel>{i18n.t('profile_picture')}</FormLabel>
           <div className='flex items-start gap-6'>
             <Avatar className='h-24 w-24 border-2'>
               <AvatarImage src={avatarPreview || (userInfo as any)?.avatar_url} />
@@ -138,7 +140,7 @@ export default function ProfileForm() {
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                 >
                   <IconUpload className='mr-2 h-4 w-4' />
-                  {avatarFile ? 'Change Photo' : 'Upload Photo'}
+                  {avatarFile ? i18n.t('change_photo') : i18n.t('upload_photo')}
                 </Button>
                 {(avatarPreview || (userInfo as any)?.avatar_url) && (
                   <Button
@@ -148,12 +150,12 @@ export default function ProfileForm() {
                     onClick={removeAvatar}
                   >
                     <IconX className='mr-2 h-4 w-4' />
-                    Remove
+                    {i18n.t('remove')}
                   </Button>
                 )}
               </div>
               <p className='text-muted-foreground text-xs'>
-                JPG, PNG or GIF. Max size 2MB. Recommended size 400x400px.
+                {i18n.t('max_size_2mb')}
               </p>
               <input
                 id='avatar-upload'
@@ -171,12 +173,12 @@ export default function ProfileForm() {
           name='name'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Full Name</FormLabel>
+              <FormLabel>{i18n.t('full_name')}</FormLabel>
               <FormControl>
-                <Input placeholder='Enter your full name' {...field} />
+                <Input placeholder={i18n.t('enter_your_full_name')} {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name. It will be visible to other users.
+                {i18n.t('public_display_name')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -189,12 +191,12 @@ export default function ProfileForm() {
             name='phone'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Phone Number</FormLabel>
+                <FormLabel>{i18n.t('phone')}</FormLabel>
                 <FormControl>
-                  <Input placeholder='+1 (555) 000-0000' {...field} value={field.value || ''} />
+                  <Input placeholder={i18n.t('phone_format_placeholder')} {...field} value={field.value || ''} />
                 </FormControl>
                 <FormDescription>
-                  Optional
+                  {i18n.t('optional')}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -206,12 +208,12 @@ export default function ProfileForm() {
             name='date_of_birth'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Date of Birth</FormLabel>
+                <FormLabel>{i18n.t('date_of_birth')}</FormLabel>
                 <FormControl>
                   <Input type='date' {...field} value={field.value || ''} />
                 </FormControl>
                 <FormDescription>
-                  Optional
+                  {i18n.t('optional')}
                 </FormDescription>
                 <FormMessage />
               </FormItem>
@@ -224,17 +226,17 @@ export default function ProfileForm() {
           name='bio'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bio</FormLabel>
+              <FormLabel>{i18n.t('bio')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='Write a short introduction about yourself...'
+                  placeholder={i18n.t('write_short_intro')}
                   className='resize-none min-h-[100px]'
                   {...field}
                   value={field.value || ''}
                 />
               </FormControl>
               <FormDescription>
-                Brief description for your profile. Max 500 characters.
+                {i18n.t('brief_description_profile')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -243,7 +245,7 @@ export default function ProfileForm() {
 
         <div className='flex gap-3 pt-4'>
           <Button type='submit' disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Save Changes'}
+            {isLoading ? i18n.t('saving') : i18n.t('save_changes')}
           </Button>
           <Button
             type='button'
@@ -251,7 +253,7 @@ export default function ProfileForm() {
             onClick={() => form.reset()}
             disabled={isLoading}
           >
-            Cancel
+            {i18n.t('cancel')}
           </Button>
         </div>
       </form>
