@@ -103,6 +103,11 @@ export const getSidebarData = (): SidebarData => {
               },
             ],
           },
+          ...(hasPermission('activity_logs.view') ? [{
+            title: 'Activity Logs',
+            url: '/activity-logs' as const,
+            icon: IconUserCog,
+          }] : []),
           {
             title: 'Help Center',
             url: '/help-center',

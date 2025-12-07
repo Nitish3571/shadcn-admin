@@ -53,11 +53,9 @@ type PermissionModule = { module: { id: number | null; name: string; slug?: stri
 type ApiRole = { id: number; name: string; permissions?: ApiPermission[] };
 
 const normalizePermissionName = (name: string) => {
-  // convert underscore style to dot style, and ensure lower case
+  // Just lowercase, don't convert underscores
+  // Permissions can have underscores (like activity_logs.view)
   if (!name) return name;
-  if (name.includes('_')) {
-    return name.replace(/_/g, '.').toLowerCase();
-  }
   return name.toLowerCase();
 };
 

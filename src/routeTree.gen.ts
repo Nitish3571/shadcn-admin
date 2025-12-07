@@ -35,6 +35,7 @@ import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authentic
 import { Route as AuthenticatedClientsIndexImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedActivityLogsIndexImport } from './routes/_authenticated/activity-logs/index'
 import { Route as AuthenticatedSettingsSecurityImport } from './routes/_authenticated/settings/security'
 import { Route as AuthenticatedSettingsNotificationsImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayImport } from './routes/_authenticated/settings/display'
@@ -191,6 +192,13 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+
+const AuthenticatedActivityLogsIndexRoute =
+  AuthenticatedActivityLogsIndexImport.update({
+    id: '/activity-logs/',
+    path: '/activity-logs/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 const AuthenticatedSettingsSecurityRoute =
   AuthenticatedSettingsSecurityImport.update({
@@ -378,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsSecurityImport
       parentRoute: typeof AuthenticatedSettingsRouteImport
     }
+    '/_authenticated/activity-logs/': {
+      id: '/_authenticated/activity-logs/'
+      path: '/activity-logs'
+      fullPath: '/activity-logs'
+      preLoaderRoute: typeof AuthenticatedActivityLogsIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/apps/': {
       id: '/_authenticated/apps/'
       path: '/apps'
@@ -468,6 +483,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedChangePasswordRoute: typeof AuthenticatedChangePasswordRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedActivityLogsIndexRoute: typeof AuthenticatedActivityLogsIndexRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
@@ -481,6 +497,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedChangePasswordRoute: AuthenticatedChangePasswordRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedActivityLogsIndexRoute: AuthenticatedActivityLogsIndexRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
@@ -515,6 +532,7 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/activity-logs': typeof AuthenticatedActivityLogsIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
@@ -545,6 +563,7 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/activity-logs': typeof AuthenticatedActivityLogsIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
@@ -578,6 +597,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/settings/security': typeof AuthenticatedSettingsSecurityRoute
+  '/_authenticated/activity-logs/': typeof AuthenticatedActivityLogsIndexRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
@@ -612,6 +632,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings/security'
+    | '/activity-logs'
     | '/apps'
     | '/chats'
     | '/clients'
@@ -641,6 +662,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/settings/security'
+    | '/activity-logs'
     | '/apps'
     | '/chats'
     | '/clients'
@@ -672,6 +694,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/settings/security'
+    | '/_authenticated/activity-logs/'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
     | '/_authenticated/clients/'
@@ -746,6 +769,7 @@ export const routeTree = rootRoute
         "/_authenticated/settings",
         "/_authenticated/change-password",
         "/_authenticated/",
+        "/_authenticated/activity-logs/",
         "/_authenticated/apps/",
         "/_authenticated/chats/",
         "/_authenticated/clients/",
@@ -830,6 +854,10 @@ export const routeTree = rootRoute
     "/_authenticated/settings/security": {
       "filePath": "_authenticated/settings/security.tsx",
       "parent": "/_authenticated/settings"
+    },
+    "/_authenticated/activity-logs/": {
+      "filePath": "_authenticated/activity-logs/index.tsx",
+      "parent": "/_authenticated"
     },
     "/_authenticated/apps/": {
       "filePath": "_authenticated/apps/index.tsx",

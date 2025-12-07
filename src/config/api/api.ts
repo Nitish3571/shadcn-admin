@@ -30,6 +30,12 @@
   permissions: {
     list: 'permissions',
     show: (id: number) => `permissions/${id}`
+  },
+  activityLogs: {
+    list: 'activity-logs',
+    show: (id: number) => `activity-logs/${id}`,
+    stats: 'activity-logs/stats',
+    delete: (ids: string) => `activity-logs/${ids}`
   }
 };
 

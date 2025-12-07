@@ -79,7 +79,12 @@ export const useAuthStore = create<AuthState>()(
       // Check if user has permission(s) - OR logic for arrays
       hasPermission: (permission) => {
         const { userInfo } = get();
-        if (!userInfo?.permissions) return false;
+        if (!userInfo) return false;
+        
+        // If user_type is 1 (SUPER_ADMIN), grant all permissions
+        if (userInfo.user_type === 1) return true;
+        
+        if (!userInfo.permissions) return false;
         
         const userPermissions = userInfo.permissions.map((p) => p.name);
         
@@ -93,7 +98,12 @@ export const useAuthStore = create<AuthState>()(
       // Check if user has ALL permissions - AND logic
       hasAllPermissions: (permissions) => {
         const { userInfo } = get();
-        if (!userInfo?.permissions) return false;
+        if (!userInfo) return false;
+        
+        // If user_type is 1 (SUPER_ADMIN), grant all permissions
+        if (userInfo.user_type === 1) return true;
+        
+        if (!userInfo.permissions) return false;
         
         const userPermissions = userInfo.permissions.map((p) => p.name);
         return permissions.every((p) => userPermissions.includes(p));
