@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuthStore } from '@/stores/authStore'
+import { useTranslation } from 'react-i18next'
 
 export function ProfileDropdown({
   user,
@@ -22,6 +23,7 @@ export function ProfileDropdown({
     avatar: string
   }
 }) {
+  const { t } = useTranslation()
   const navigate=useNavigate()
   const { logout } = useAuthStore()
   const handleLogout = () => {
@@ -57,26 +59,26 @@ export function ProfileDropdown({
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
             <Link to='/settings'>
-              Profile
+              {t('profile')}
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to='/change-password'>
-              Change Password
+              {t('change_password')}
               <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link to='/settings'>
-              Settings
+              {t('settings')}
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
-          Log out
+          {t('logout')}
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
