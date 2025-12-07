@@ -8,18 +8,18 @@ import { useDeleteRole } from '../services/roles.services';
 
 export function RoleDeleteModal() {
   const { open, setOpen, currentRow } = useRoleStore();
-  const { mutate: deleteUser, isPending } = useDeleteRole();
+  const { mutate: deleteRole, isPending } = useDeleteRole();
 
   const handleDelete = () => {
     if (!currentRow?.id) return;
 
-    deleteUser(currentRow.id, {
+    deleteRole(String(currentRow.id), {
       onSuccess: () => {
-        toast.success('User deleted successfully!');
+        toast.success('Role deleted successfully!');
         setOpen(null);
       },
       onError: (error: any) => {
-        toast.error(error?.message || 'Failed to delete user');
+        toast.error(error?.message || 'Failed to delete role');
       },
     });
   };
@@ -30,8 +30,8 @@ export function RoleDeleteModal() {
       onClose={(state) => !state && setOpen(null)}
       onConfirm={handleDelete}
       loading={isPending}
-      title="Delete User"
-      description={`Are you sure you want to delete ${currentRow?.name || 'this user'}? This action cannot be undone and will permanently remove their data from the system.`}
+      title="Delete Role"
+      description={`Are you sure you want to delete ${currentRow?.name || 'this role'}? This action cannot be undone and will permanently remove the role from the system.`}
       confirmButtonText="Delete"
       iconComponent={<Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />}
       confirmButtonColor="destructive"

@@ -84,15 +84,14 @@ export function UserForm() {
   const { mutate: saveUser, isPending: saving } = usePostUser();
 
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]); // single source of truth for checkboxes
-  const [manualPermissions, setManualPermissions] = useState<string[]>([]); // user toggles
-  const [roleDerivedPermissions, setRoleDerivedPermissions] = useState<string[]>([]); // derived from selected roles
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  const [roleDerivedPermissions, setRoleDerivedPermissions] = useState<string[]>([]);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
 
   const form = useForm<UserFormSchema>({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(userFormSchema) as any,
     defaultValues: {
       name: '',
       email: '',
@@ -102,7 +101,7 @@ export function UserForm() {
       bio: '',
       date_of_birth: '',
       status: 1,
-      user_type: DEFAULT_USER_TYPE, // Default to regular user
+      user_type: DEFAULT_USER_TYPE,
       roles: [],
       permissions: [],
       isEdit: false,
@@ -125,7 +124,7 @@ export function UserForm() {
             id: p.id,
             rawName: p.name,
             name: normalizePermissionName(p.name),
-            description: p.description || '',
+            description: p.description,
           }))
         : [];
       return {
@@ -135,13 +134,6 @@ export function UserForm() {
       };
     });
   }, [permissionModules]);
-
-  // Flatten all module permission names for quick lookup
-  const allPermissionNames = useMemo(() => {
-    const set = new Set<string>();
-    normalizedModules.forEach((mod) => mod.permissions.forEach((p) => set.add(p.name)));
-    return Array.from(set);
-  }, [normalizedModules]);
 
   // Helper: Given a permission name, find the module item
   const findModuleForPermission = (permissionName: string) => {
@@ -196,7 +188,6 @@ export function UserForm() {
       // set states
       setSelectedRoles(roleNames);
       setRoleDerivedPermissions(Array.from(rolePermissionNames));
-      setManualPermissions(directPermissionNames);
       setSelectedPermissions(Array.from(new Set([...Array.from(rolePermissionNames), ...directPermissionNames])));
       setAvatarPreview(user.avatar_url || '');
 
@@ -218,7 +209,6 @@ export function UserForm() {
       setSelectedRoles([]);
       setSelectedPermissions([]);
       setRoleDerivedPermissions([]);
-      setManualPermissions([]);
       setAvatarFile(null);
       setAvatarPreview('');
       form.reset({
@@ -272,10 +262,10 @@ export function UserForm() {
     // Only append roles/permissions if user has permission to manage them
     if (canManageRoles) {
       // Append roles
-      (values.roles || []).forEach((role) => formData.append('roles[]', role));
+      values.roles.forEach((role) => formData.append('roles[]', role));
 
-      // Append direct permissions (we will send selectedPermissions - but you may want to send only manual ones)
-      (selectedPermissions || []).forEach((permission) => formData.append('permissions[]', permission));
+      // Append direct permissions
+      selectedPermissions.forEach((permission) => formData.append('permissions[]', permission));
     }
 
     // Append avatar if selected
@@ -299,7 +289,6 @@ export function UserForm() {
         setAvatarFile(null);
         setAvatarPreview('');
         setSelectedPermissions([]);
-        setManualPermissions([]);
         setRoleDerivedPermissions([]);
         setSelectedRoles([]);
       },
@@ -339,14 +328,11 @@ export function UserForm() {
           module.permissions.forEach((p) => {
             if (!roleSet.has(p.name)) {
               currentlySelected.delete(p.name);
-              // remove from manualPermissions if present
-              setManualPermissions((prev) => prev.filter((x) => x !== p.name));
             }
           });
         }
       } else {
         currentlySelected.delete(normalized);
-        setManualPermissions((prev) => prev.filter((x) => x !== normalized));
       }
     } else {
       // Checking permission
@@ -357,16 +343,8 @@ export function UserForm() {
       if (!isView) {
         const viewName = `${parts[0]}.view`;
         currentlySelected.add(viewName);
-        // add viewName to manual permissions if not present and not role-derived
-        if (!roleDerivedPermissions.includes(viewName)) {
-          setManualPermissions((prev) => Array.from(new Set([...prev, viewName])));
-        }
       }
       currentlySelected.add(normalized);
-      // add normalized to manualPermissions (if not role-derived)
-      if (!roleDerivedPermissions.includes(normalized)) {
-        setManualPermissions((prev) => Array.from(new Set([...prev, normalized])));
-      }
     }
 
     const final = Array.from(currentlySelected);
@@ -385,17 +363,11 @@ export function UserForm() {
       modulePermNames.forEach((n) => {
         if (!roleSet.has(n)) {
           selectionSet.delete(n);
-          setManualPermissions((prev) => prev.filter((x) => x !== n));
         }
       });
     } else {
-      // Check all (add to selection). If view missing, add it automatically.
+      // Check all (add to selection)
       modulePermNames.forEach((n) => selectionSet.add(n));
-      modulePermNames.forEach((n) => {
-        if (!roleDerivedPermissions.includes(n)) {
-          setManualPermissions((prev) => Array.from(new Set([...prev, n])));
-        }
-      });
     }
 
     setSelectedPermissions(Array.from(selectionSet));
@@ -426,7 +398,6 @@ export function UserForm() {
           setAvatarFile(null);
           setAvatarPreview('');
           setSelectedPermissions([]);
-          setManualPermissions([]);
           setRoleDerivedPermissions([]);
           setSelectedRoles([]);
         }
@@ -655,12 +626,12 @@ export function UserForm() {
                     </div>
                   </div>
                   <PermissionsManager
-                    modules={normalizedModules}
+                    modules={normalizedModules as any}
                     selectedPermissions={selectedPermissions}
                     onPermissionToggle={handlePermissionToggle}
-                    onModuleToggle={handleModuleToggle}
+                    onModuleToggle={handleModuleToggle as any}
+                    onGlobalToggle={() => {}}
                     disabled={isDisabled}
-                    roleDerivedPermissions={roleDerivedPermissions}
                   />
               
                 </div>

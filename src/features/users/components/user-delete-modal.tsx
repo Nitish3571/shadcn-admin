@@ -13,7 +13,7 @@ export function UserDeleteModal() {
   const handleDelete = () => {
     if (!currentRow?.id) return;
 
-    deleteUser(currentRow.id, {
+    deleteUser(String(currentRow.id), {
       onSuccess: () => {
         toast.success('User deleted successfully!');
         setOpen(null);

@@ -59,7 +59,7 @@ export const usePostUser = () => {
 export const useDeleteUser = () => {
   const { setOpen } = useUserStore();
   return useDeleteData({
-    url: API.users.list,
+    url: (ids: string) => API.users.delete(ids),
     refetchQueries: [API.users.list],
     mutationOptions: {
       onSuccess: () => {

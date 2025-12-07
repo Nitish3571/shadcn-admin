@@ -7,22 +7,23 @@ import {
 } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-interface DeleteDataOptions<TData> {
-  url: string;
+interface DeleteDataOptions<TData, TVariables = void> {
+  url: string | ((variables: TVariables) => string);
   refetchQueries?: string[];
-  mutationOptions?: UseMutationOptions<TData, Error, void>;
+  mutationOptions?: UseMutationOptions<TData, Error, TVariables>;
 }
 
-const useDeleteData = <TData = unknown>({
+const useDeleteData = <TData = unknown, TVariables = void>({
   url,
   refetchQueries = [],
   mutationOptions
-}: DeleteDataOptions<TData>) => {
+}: DeleteDataOptions<TData, TVariables>) => {
   const queryClient = useQueryClient();
 
-  return useMutation<TData, Error, void>({
-    mutationFn: async (): Promise<TData> => {
-      const response = await instance.delete({ url });
+  return useMutation<TData, Error, TVariables>({
+    mutationFn: async (variables: TVariables): Promise<TData> => {
+      const deleteUrl = typeof url === 'function' ? url(variables) : url;
+      const response = await instance.delete({ url: deleteUrl });
 
       if (response?.statusCode === 200) {
         return response.data as TData;

@@ -14,8 +14,8 @@ export const userFormSchema = z
     date_of_birth: z.string().optional(),
     user_type: z.coerce.number().positive({ message: 'User type is required.' }),
     status: z.coerce.number().positive({ message: 'Status is required.' }),
-    roles: z.array(z.string()).optional().default([]),
-    permissions: z.array(z.string()).optional(),
+    roles: z.array(z.string()).default([]),
+    permissions: z.array(z.string()).default([]),
     avatar: z.any().optional(),
     isEdit: z.boolean().default(false),
   })

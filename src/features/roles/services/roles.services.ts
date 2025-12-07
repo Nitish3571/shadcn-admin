@@ -43,10 +43,10 @@ export const usePostRole = () => {
   });
 };
 
-export const useDeleteRole = (ids: string) => {
+export const useDeleteRole = () => {
   const { setOpen } = useRoleStore();
   return useDeleteData({
-    url: API.roles.delete(ids),
+    url: (ids: string) => API.roles.delete(ids),
     refetchQueries: [API.roles.list],
     mutationOptions: {
       onSuccess: () => {
