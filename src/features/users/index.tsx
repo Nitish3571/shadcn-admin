@@ -14,7 +14,7 @@ import { usePermission } from '@/hooks/usePermission'
 import { USER_STATUS_OPTIONS } from '@/types/enums'
 
 export default function Users() {
-  const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
+  const [params, setParams] = useState<{ page: number; limit: number; search: string; status?: string }>({ page: 1, limit: 10, search: "" })
   const [status, setStatus] = useState<string | null>(null)
 
   const { setOpen } = useUserStore();
@@ -44,9 +44,14 @@ export default function Users() {
     setParams((prev) => ({ ...prev, page }))
   }
 
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    setParams((prev) => ({ ...prev, status: value, page: 1 }));
+  }
+
   const filters: FilterConfig[] = [
     { key: 'name', value: params.search, type: 'search', placeholder: 'Search by name...', onChange: handleSearchChange },
-    { key: 'status', value: status, type: 'select', placeholder: 'Search by status...', options: USER_STATUS_OPTIONS, onChange: (value: string) => setStatus(value) },
+    { key: 'status', value: status, type: 'select', placeholder: 'Search by status...', options: USER_STATUS_OPTIONS, onChange: handleStatusChange },
   ]
 
   const handleUserAdd = () => {

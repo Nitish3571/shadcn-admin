@@ -11,11 +11,9 @@ import { generateDynamicColumns } from './components/roles.column'
 import { MutateRoleModal } from './components/role-actions'
 import { RoleDeleteModal } from './components/role-delete-modal'
 import { usePermission } from '@/hooks/usePermission'
-import { USER_STATUS_OPTIONS } from '@/types/enums'
 
 export default function Users() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
-  const [status, setStatus] = useState<string | null>(null)
 
   const { setOpen } = useRoleStore();
   const { hasPermission } = usePermission();
@@ -46,7 +44,6 @@ export default function Users() {
 
   const filters: FilterConfig[] = [
     { key: 'name', value: params.search, type: 'search', placeholder: 'Search by name...', onChange: handleSearchChange },
-    { key: 'status', value: status, type: 'select', placeholder: 'Search by status...', options: USER_STATUS_OPTIONS, onChange: (value: string) => setStatus(value) },
   ]
 
   const handleRoleAdd = () => {
