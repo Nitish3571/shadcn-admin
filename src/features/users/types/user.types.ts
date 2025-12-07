@@ -23,6 +23,15 @@ export interface User {
   user_type: number;
   status: number;
   avatar_url?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  postal_code?: string;
+  gender?: string;
+  last_login_at?: string;
+  timezone?: string;
+  language?: string;
+  is_verified?: boolean;
   roles: Role[];
   permissions: Permission[]; // All permissions (from roles + direct)
   created_at?: string;
@@ -39,6 +48,13 @@ export interface UserFormData {
   date_of_birth?: string;
   user_type: number;
   status: number;
+  address?: string;
+  city?: string;
+  country?: string;
+  postal_code?: string;
+  gender?: string;
+  timezone?: string;
+  language?: string;
   roles: string[];
   permissions?: string[]; // Direct permissions only
   avatar?: File;

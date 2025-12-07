@@ -30,6 +30,13 @@ const profileFormSchema = z.object({
   phone: z.string().max(20, { message: i18n.t('phone_max_20_chars') }).optional().nullable(),
   date_of_birth: z.string().optional().nullable(),
   bio: z.string().max(500, { message: i18n.t('bio_max_500_chars') }).optional().nullable(),
+  address: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
+  postal_code: z.string().optional().nullable(),
+  gender: z.string().optional().nullable(),
+  timezone: z.string().optional().nullable(),
+  language: z.string().optional().nullable(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
@@ -47,6 +54,13 @@ export default function ProfileForm() {
       phone: userInfo?.phone || '',
       date_of_birth: userInfo?.date_of_birth || '',
       bio: userInfo?.bio ? JSON.stringify(userInfo.bio) : '',
+      address: (userInfo as any)?.address || '',
+      city: (userInfo as any)?.city || '',
+      country: (userInfo as any)?.country || '',
+      postal_code: (userInfo as any)?.postal_code || '',
+      gender: (userInfo as any)?.gender || '',
+      timezone: (userInfo as any)?.timezone || 'UTC',
+      language: (userInfo as any)?.language || 'en',
     },
   })
 
@@ -58,6 +72,13 @@ export default function ProfileForm() {
         phone: userInfo.phone || '',
         date_of_birth: userInfo.date_of_birth || '',
         bio: userInfo.bio ? JSON.stringify(userInfo.bio) : '',
+        address: (userInfo as any)?.address || '',
+        city: (userInfo as any)?.city || '',
+        country: (userInfo as any)?.country || '',
+        postal_code: (userInfo as any)?.postal_code || '',
+        gender: (userInfo as any)?.gender || '',
+        timezone: (userInfo as any)?.timezone || 'UTC',
+        language: (userInfo as any)?.language || 'en',
       })
     }
   }, [userInfo, form])
@@ -113,6 +134,13 @@ export default function ProfileForm() {
         formData.append('bio', JSON.stringify({ about: data.bio }))
       }
     }
+    if (data.address) formData.append('address', data.address)
+    if (data.city) formData.append('city', data.city)
+    if (data.country) formData.append('country', data.country)
+    if (data.postal_code) formData.append('postal_code', data.postal_code)
+    if (data.gender) formData.append('gender', data.gender)
+    if (data.timezone) formData.append('timezone', data.timezone)
+    if (data.language) formData.append('language', data.language)
     if (avatarFile) formData.append('avatar', avatarFile)
 
     updateProfile(formData)
@@ -242,6 +270,130 @@ export default function ProfileForm() {
             </FormItem>
           )}
         />
+
+        <div className='space-y-4'>
+          <h3 className='text-sm font-medium'>{i18n.t('additional_information')}</h3>
+          
+          <FormField
+            control={form.control}
+            name='address'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>{i18n.t('address')}</FormLabel>
+                <FormControl>
+                  <Input placeholder={i18n.t('enter_address')} {...field} value={field.value || ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className='grid gap-6 sm:grid-cols-2'>
+            <FormField
+              control={form.control}
+              name='city'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('city')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={i18n.t('enter_city')} {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='country'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('country')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={i18n.t('enter_country')} {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='grid gap-6 sm:grid-cols-2'>
+            <FormField
+              control={form.control}
+              name='postal_code'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('postal_code')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder={i18n.t('enter_postal_code')} {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='gender'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('gender')}</FormLabel>
+                  <FormControl>
+                    <select 
+                      className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background'
+                      {...field}
+                      value={field.value || ''}
+                    >
+                      <option value=''>{i18n.t('select_gender')}</option>
+                      <option value='male'>{i18n.t('male')}</option>
+                      <option value='female'>{i18n.t('female')}</option>
+                      <option value='other'>{i18n.t('other')}</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className='grid gap-6 sm:grid-cols-2'>
+            <FormField
+              control={form.control}
+              name='timezone'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('timezone')}</FormLabel>
+                  <FormControl>
+                    <Input placeholder='UTC' {...field} value={field.value || 'UTC'} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='language'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>{i18n.t('language')}</FormLabel>
+                  <FormControl>
+                    <select 
+                      className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background'
+                      {...field}
+                      value={field.value || 'en'}
+                    >
+                      <option value='en'>{i18n.t('english')}</option>
+                      <option value='ar'>{i18n.t('arabic')}</option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
 
         <div className='flex gap-3 pt-4'>
           <Button type='submit' disabled={isLoading}>

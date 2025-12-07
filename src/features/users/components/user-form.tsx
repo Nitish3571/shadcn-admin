@@ -102,6 +102,13 @@ export function UserForm() {
       date_of_birth: '',
       status: 1,
       user_type: DEFAULT_USER_TYPE,
+      address: '',
+      city: '',
+      country: '',
+      postal_code: '',
+      gender: '',
+      timezone: 'UTC',
+      language: 'en',
       roles: [],
       permissions: [],
       isEdit: false,
@@ -199,6 +206,13 @@ export function UserForm() {
         date_of_birth: formatDateForInput(user.date_of_birth),
         status: user.status || 1,
         user_type: user.user_type || DEFAULT_USER_TYPE,
+        address: user.address || '',
+        city: user.city || '',
+        country: user.country || '',
+        postal_code: user.postal_code || '',
+        gender: user.gender || '',
+        timezone: user.timezone || 'UTC',
+        language: user.language || 'en',
         roles: roleNames,
         permissions: Array.from(new Set([...Array.from(rolePermissionNames), ...directPermissionNames])),
         password: '',
@@ -221,6 +235,13 @@ export function UserForm() {
         date_of_birth: '',
         status: 1,
         user_type: DEFAULT_USER_TYPE,
+        address: '',
+        city: '',
+        country: '',
+        postal_code: '',
+        gender: '',
+        timezone: 'UTC',
+        language: 'en',
         roles: [],
         permissions: [],
         isEdit: false,
@@ -258,6 +279,13 @@ export function UserForm() {
     }
     if (values.bio) formData.append('bio', values.bio);
     if (values.date_of_birth) formData.append('date_of_birth', values.date_of_birth);
+    if (values.address) formData.append('address', values.address);
+    if (values.city) formData.append('city', values.city);
+    if (values.country) formData.append('country', values.country);
+    if (values.postal_code) formData.append('postal_code', values.postal_code);
+    if (values.gender) formData.append('gender', values.gender);
+    if (values.timezone) formData.append('timezone', values.timezone);
+    if (values.language) formData.append('language', values.language);
 
     // Only append roles/permissions if user has permission to manage them
     if (canManageRoles) {
@@ -552,6 +580,135 @@ export function UserForm() {
                       </FormItem>
                     )}
                   />
+                </div>
+
+                {/* Additional Information */}
+                <div className="space-y-4 p-4 border rounded-md">
+                  <h3 className="text-sm font-medium text-gray-700">{t('additional_information')}</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="address"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('address')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('enter_address')} disabled={isDisabled} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="city"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('city')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('enter_city')} disabled={isDisabled} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="country"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('country')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('enter_country')} disabled={isDisabled} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="postal_code"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('postal_code')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder={t('enter_postal_code')} disabled={isDisabled} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="gender"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('gender')}</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            disabled={isDisabled}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('select_gender')} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="male">{t('male')}</SelectItem>
+                              <SelectItem value="female">{t('female')}</SelectItem>
+                              <SelectItem value="other">{t('other')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="timezone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('timezone')}</FormLabel>
+                          <FormControl>
+                            <Input placeholder="UTC" disabled={isDisabled} {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="language"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>{t('language')}</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            disabled={isDisabled}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder={t('select_language')} />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="en">{t('english')}</SelectItem>
+                              <SelectItem value="ar">{t('arabic')}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </div>
 
                 {/* Password Section */}
