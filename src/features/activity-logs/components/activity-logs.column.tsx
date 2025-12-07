@@ -5,9 +5,29 @@ import { ColumnDef } from '@tanstack/react-table';
 import { cn } from '@/lib/utils';
 import ActivityLogActions from '../actions/activity-log-actions';
 import { ActivityLog } from '../types/activity-log.types';
+import i18n from '@/i18n';
 
 const capitalize = (str: string) =>
   str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+
+// Helper to get translated header
+const getTranslatedHeader = (key: string, fallbackLabel?: string): string => {
+  const translationMap: Record<string, string> = {
+    'id': 'id',
+    'log_name': 'log_name',
+    'description': 'description',
+    'event': 'event',
+    'causer_id': 'user',
+    'subject_type': 'subject_type',
+    'created_at': 'created_at',
+  };
+
+  const translationKey = translationMap[key] || key;
+  const translated = i18n.t(translationKey);
+  
+  // If translation returns the key itself (not found), use fallback label
+  return translated !== translationKey ? translated : (fallbackLabel || capitalize(key));
+};
 
 const getEventColor = (event: string) => {
   switch (event) {
@@ -49,7 +69,7 @@ export const generateDynamicColumns = (
 
       const column: ColumnDef<ActivityLog> = {
         accessorKey: key,
-        header: capitalize(col.label || key),
+        header: getTranslatedHeader(key, col.label),
         enableSorting: col.sortable === true,
       };
 

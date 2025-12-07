@@ -36,6 +36,10 @@
     show: (id: number) => `activity-logs/${id}`,
     stats: 'activity-logs/stats',
     delete: (ids: string) => `activity-logs/${ids}`
+  },
+  loginHistory: {
+    list: 'login-history',
+    show: (id: number) => `login-history/${id}`
   }
 };
 

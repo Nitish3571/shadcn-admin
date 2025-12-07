@@ -110,6 +110,11 @@ export const getSidebarData = (): SidebarData => {
             icon: IconUserCog,
           }] : []),
           {
+            title: t('login_history'),
+            url: '/login-history' as const,
+            icon: IconKey,
+          },
+          {
             title: t('help_center'),
             url: '/help-center',
             icon: IconHelp,

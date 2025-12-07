@@ -31,6 +31,7 @@ import { Route as AuthenticatedUsersIndexImport } from './routes/_authenticated/
 import { Route as AuthenticatedTasksIndexImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexImport } from './routes/_authenticated/settings/index'
 import { Route as AuthenticatedRolesIndexImport } from './routes/_authenticated/roles/index'
+import { Route as AuthenticatedLoginHistoryIndexImport } from './routes/_authenticated/login-history/index'
 import { Route as AuthenticatedHelpCenterIndexImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedClientsIndexImport } from './routes/_authenticated/clients/index'
 import { Route as AuthenticatedChatsIndexImport } from './routes/_authenticated/chats/index'
@@ -167,6 +168,13 @@ const AuthenticatedRolesIndexRoute = AuthenticatedRolesIndexImport.update({
   path: '/roles/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+
+const AuthenticatedLoginHistoryIndexRoute =
+  AuthenticatedLoginHistoryIndexImport.update({
+    id: '/login-history/',
+    path: '/login-history/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexImport.update({
@@ -421,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexImport
       parentRoute: typeof AuthenticatedRouteImport
     }
+    '/_authenticated/login-history/': {
+      id: '/_authenticated/login-history/'
+      path: '/login-history'
+      fullPath: '/login-history'
+      preLoaderRoute: typeof AuthenticatedLoginHistoryIndexImport
+      parentRoute: typeof AuthenticatedRouteImport
+    }
     '/_authenticated/roles/': {
       id: '/_authenticated/roles/'
       path: '/roles'
@@ -488,6 +503,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedLoginHistoryIndexRoute: typeof AuthenticatedLoginHistoryIndexRoute
   AuthenticatedRolesIndexRoute: typeof AuthenticatedRolesIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
@@ -502,6 +518,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedLoginHistoryIndexRoute: AuthenticatedLoginHistoryIndexRoute,
   AuthenticatedRolesIndexRoute: AuthenticatedRolesIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
@@ -537,6 +554,7 @@ export interface FileRoutesByFullPath {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/login-history': typeof AuthenticatedLoginHistoryIndexRoute
   '/roles': typeof AuthenticatedRolesIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -568,6 +586,7 @@ export interface FileRoutesByTo {
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/login-history': typeof AuthenticatedLoginHistoryIndexRoute
   '/roles': typeof AuthenticatedRolesIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
@@ -602,6 +621,7 @@ export interface FileRoutesById {
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/login-history/': typeof AuthenticatedLoginHistoryIndexRoute
   '/_authenticated/roles/': typeof AuthenticatedRolesIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
@@ -637,6 +657,7 @@ export interface FileRouteTypes {
     | '/chats'
     | '/clients'
     | '/help-center'
+    | '/login-history'
     | '/roles'
     | '/settings/'
     | '/tasks'
@@ -667,6 +688,7 @@ export interface FileRouteTypes {
     | '/chats'
     | '/clients'
     | '/help-center'
+    | '/login-history'
     | '/roles'
     | '/settings'
     | '/tasks'
@@ -699,6 +721,7 @@ export interface FileRouteTypes {
     | '/_authenticated/chats/'
     | '/_authenticated/clients/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/login-history/'
     | '/_authenticated/roles/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
@@ -774,6 +797,7 @@ export const routeTree = rootRoute
         "/_authenticated/chats/",
         "/_authenticated/clients/",
         "/_authenticated/help-center/",
+        "/_authenticated/login-history/",
         "/_authenticated/roles/",
         "/_authenticated/tasks/",
         "/_authenticated/users/"
@@ -873,6 +897,10 @@ export const routeTree = rootRoute
     },
     "/_authenticated/help-center/": {
       "filePath": "_authenticated/help-center/index.tsx",
+      "parent": "/_authenticated"
+    },
+    "/_authenticated/login-history/": {
+      "filePath": "_authenticated/login-history/index.tsx",
       "parent": "/_authenticated"
     },
     "/_authenticated/roles/": {
