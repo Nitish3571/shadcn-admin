@@ -5,13 +5,22 @@ import { Trash2 } from 'lucide-react';
 import { useUserStore } from '../store/user-store';
 import { useDeleteUser } from '../services/users.services';
 import { DeleteModal } from '@/components/shared/common-delete-modal';
+import { useAuthStore } from '@/stores/authStore';
 
 export function UserDeleteModal() {
   const { open, setOpen, currentRow } = useUserStore();
   const { mutate: deleteUser, isPending } = useDeleteUser();
+  const currentUser = useAuthStore((state) => state.userInfo);
 
   const handleDelete = () => {
     if (!currentRow?.id) return;
+
+    // Extra safety check - prevent deleting current user
+    if (currentUser?.id === currentRow.id) {
+      toast.error('You cannot delete your own account');
+      setOpen(null);
+      return;
+    }
 
     deleteUser(String(currentRow.id), {
       onSuccess: () => {
