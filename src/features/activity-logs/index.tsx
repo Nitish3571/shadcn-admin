@@ -6,6 +6,7 @@ import { ActivityLogDetailModal } from './components/activity-log-detail-modal';
 import { ActivityLogDeleteModal } from './components/activity-log-delete-modal';
 import { DataTablePage } from '@/components/shared/table/data-table-page';
 import { ActivityLog, LOG_NAME_OPTIONS, EVENT_OPTIONS } from './types/activity-log.types';
+import { ExportButton } from '@/components/shared/export-button';
 
 export default function ActivityLogs() {
   const [params, setParams] = useState<{
@@ -105,6 +106,14 @@ export default function ActivityLogs() {
       emptyDescription="Activity logs will appear here as users interact with the system"
       hasActiveFilters={!!(params.search || params.log_name || params.event)}
       loadingText="Loading Activity Logs..."
+      headerActions={
+        <ExportButton
+          endpoint="activity-logs/export"
+          filename="activity_logs"
+          permission="activity_logs.export"
+          params={{ search: params.search, log_name: params.log_name, event: params.event }}
+        />
+      }
     >
       <ActivityLogDetailModal />
       <ActivityLogDeleteModal />

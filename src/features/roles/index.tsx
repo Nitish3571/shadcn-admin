@@ -8,6 +8,7 @@ import { RoleDeleteModal } from './components/role-delete-modal'
 import { usePermission } from '@/hooks/usePermission'
 import { DataTablePage } from '@/components/shared/table/data-table-page'
 import { Role } from './types/role.types'
+import { ExportButton } from '@/components/shared/export-button'
 
 export default function Roles() {
   const [params, setParams] = useState({ page: 1, limit: 10, search: "" })
@@ -61,6 +62,14 @@ export default function Roles() {
       emptyDescription="Start by adding your first role"
       hasActiveFilters={!!params.search}
       loadingText="Loading Roles..."
+      headerActions={
+        <ExportButton
+          endpoint="roles/export"
+          filename="roles"
+          permission="roles.export"
+          params={{ search: params.search }}
+        />
+      }
     >
       <MutateRoleModal />
       <RoleDeleteModal />

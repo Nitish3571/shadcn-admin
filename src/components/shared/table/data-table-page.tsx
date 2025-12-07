@@ -1,6 +1,7 @@
 import { ReactNode, useMemo, useRef, useEffect } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
-import { PageHeader } from '@/components/shared/layout/page-header';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import PageLayout from '@/components/shared/layout/page-layout';
 import { FilterConfig } from '@/components/shared/table/filter-toolbar';
 import { GlobalTable } from '@/components/shared/table/global-table';
@@ -13,6 +14,7 @@ interface DataTablePageProps<TData> {
   description?: string;
   buttonLabel?: string;
   onButtonClick?: () => void;
+  headerActions?: ReactNode;
   
   // Data props
   data: any;
@@ -48,6 +50,7 @@ export function DataTablePage<TData>({
   description,
   buttonLabel,
   onButtonClick,
+  headerActions,
   data: listData,
   loading,
   error,
@@ -110,12 +113,29 @@ export function DataTablePage<TData>({
 
   return (
     <PageLayout>
-      <PageHeader 
-        title={title}
-        description={description}
-        buttonLabel={buttonLabel}
-        onButtonClick={onButtonClick}
-      />
+      <div className="flex items-center justify-between">
+        <div className="space-y-1">
+          <h1 className="text-3xl leading-tight font-bold tracking-tight">
+            {title}
+          </h1>
+          {description && (
+            <p className="text-sm text-muted-foreground">{description}</p>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {buttonLabel && (
+            <Button
+              onClick={onButtonClick}
+              className="flex items-center gap-2 px-4 py-2 md:px-5 md:py-2.5 cursor-pointer"
+            >
+              <Plus className="h-4 w-4" />
+              {buttonLabel}
+            </Button>
+          )}
+          {headerActions}
+        </div>
+      </div>
       
       {filters && filters.length > 0 && (
         <GlobalFilterSection filters={filters} />

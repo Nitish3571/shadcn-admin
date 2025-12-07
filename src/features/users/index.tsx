@@ -9,6 +9,7 @@ import { usePermission } from '@/hooks/usePermission'
 import { USER_STATUS_OPTIONS } from '@/types/enums'
 import { DataTablePage } from '@/components/shared/table/data-table-page'
 import { User } from './types/user.types'
+import { ExportButton } from '@/components/shared/export-button'
 
 export default function Users() {
   const [params, setParams] = useState<{ page: number; limit: number; search: string; status?: string }>({ 
@@ -80,6 +81,14 @@ export default function Users() {
       emptyDescription="Start by adding your first user"
       hasActiveFilters={!!(params.search || params.status)}
       loadingText="Loading Users..."
+      headerActions={
+        <ExportButton
+          endpoint="users/export"
+          filename="users"
+          permission="users.export"
+          params={{ search: params.search, status: params.status }}
+        />
+      }
     >
       <MutateUserModal />
       <UserDeleteModal />
