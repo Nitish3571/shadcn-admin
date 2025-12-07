@@ -1,17 +1,20 @@
-import PageLayout from '@/components/shared/layout/page-layout'
-import { PageHeader } from '@/components/shared/layout/page-header'
+import { Separator } from '@/components/ui/separator'
 import { ChangePasswordForm } from './components/change-password-form'
+import PageLayout from '@/components/shared/layout/page-layout'
 
 export default function ChangePassword() {
   return (
     <PageLayout>
-      <PageHeader
-        title='Change Password'
-        description='Update your password to keep your account secure.'
-      />
-      <div className='mt-6 max-w-2xl'>
-        <ChangePasswordForm />
+    <div className='space-y-6'>
+      <div>
+        <h3 className='text-lg font-medium'>Change Password</h3>
+        <p className='text-muted-foreground text-sm'>
+          Update your password to keep your account secure.
+        </p>
       </div>
+      <Separator />
+      <ChangePasswordForm />
+    </div>
     </PageLayout>
   )
 }

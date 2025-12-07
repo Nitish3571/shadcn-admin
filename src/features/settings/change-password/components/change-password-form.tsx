@@ -76,7 +76,7 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className={cn('space-y-8', className)}
+        className={cn('space-y-6', className)}
         {...props}
       >
         <FormField
@@ -127,9 +127,19 @@ export function ChangePasswordForm({ className, ...props }: ChangePasswordFormPr
             </FormItem>
           )}
         />
-        <Button type='submit' disabled={isLoading}>
-          {isLoading ? 'Updating password...' : 'Update password'}
-        </Button>
+        <div className='flex gap-3 pt-4'>
+          <Button type='submit' disabled={isLoading}>
+            {isLoading ? 'Updating...' : 'Update Password'}
+          </Button>
+          <Button
+            type='button'
+            variant='outline'
+            onClick={() => form.reset()}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+        </div>
       </form>
     </Form>
   )

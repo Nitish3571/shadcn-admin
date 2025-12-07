@@ -1,39 +1,65 @@
 import PageLayout from '@/components/shared/layout/page-layout'
-import { Separator } from '@/components/ui/separator'
 import {
   IconBrowserCheck,
+  IconKey,
   IconNotification,
   IconPalette,
   IconTool,
   IconUser,
 } from '@tabler/icons-react'
-import { Outlet } from '@tanstack/react-router'
-import SidebarNav from './components/sidebar-nav'
+import { Link, Outlet, useLocation } from '@tanstack/react-router'
+import { cn } from '@/lib/utils'
 
 export default function Settings() {
-  return (
-    <>
+  const location = useLocation()
+  
+  const isActive = (href: string) => {
+    if (href === '/settings') {
+      return location.pathname === '/settings'
+    }
+    return location.pathname.startsWith(href)
+  }
 
-      <PageLayout>
-        <div className='space-y-0.5'>
+  return (
+    <PageLayout>
+      <div className='space-y-6'>
+        {/* Header */}
+        <div className='space-y-1'>
           <h1 className='text-2xl font-bold tracking-tight md:text-3xl'>
             Settings
           </h1>
-          <p className='text-muted-foreground'>
-            Manage your account settings and set e-mail preferences.
+          <p className='text-muted-foreground text-sm'>
+            Manage your account settings and preferences.
           </p>
         </div>
-        <Separator className='my-4 lg:my-6' />
-        <div className='flex flex-1 flex-col space-y-2 overflow-hidden md:space-y-2 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <aside className='top-0 lg:sticky lg:w-1/5'>
-            <SidebarNav items={sidebarNavItems} />
-          </aside>
-          <div className='flex w-full overflow-y-hidden p-1'>
-            <Outlet />
-          </div>
+        
+        {/* Horizontal Navigation Tabs */}
+        <div className='border-b'>
+          <nav className='flex gap-1 overflow-x-auto' aria-label='Settings tabs'>
+            {sidebarNavItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={cn(
+                  'flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-medium transition-all whitespace-nowrap',
+                  isActive(item.href)
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:border-muted-foreground/50'
+                )}
+              >
+                {item.icon}
+                <span>{item.title}</span>
+              </Link>
+            ))}
+          </nav>
         </div>
-      </PageLayout>
-    </>
+        
+        {/* Content */}
+        <div>
+          <Outlet />
+        </div>
+      </div>
+    </PageLayout>
   )
 }
 
@@ -47,6 +73,11 @@ const sidebarNavItems = [
     title: 'Account',
     icon: <IconTool size={18} />,
     href: '/settings/account',
+  },
+  {
+    title: 'Security',
+    icon: <IconKey size={18} />,
+    href: '/settings/security',
   },
   {
     title: 'Appearance',

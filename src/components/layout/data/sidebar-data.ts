@@ -1,6 +1,7 @@
 import {
   IconBrowserCheck,
   IconHelp,
+  IconKey,
   IconLayoutDashboard,
   IconNotification,
   IconPalette,
@@ -79,6 +80,11 @@ export const getSidebarData = (): SidebarData => {
                 title: 'Account',
                 url: '/settings/account',
                 icon: IconTool,
+              },
+              {
+                title: 'Security',
+                url: '/settings/security',
+                icon: IconKey,
               },
               {
                 title: 'Appearance',

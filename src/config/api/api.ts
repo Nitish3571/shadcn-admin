@@ -8,7 +8,8 @@
     resendVerification: 'auth/resend-verification',
     forgotPassword: 'auth/forgot-password',
     resetPassword: 'auth/reset-password',
-    changePassword: 'auth/change-password'
+    changePassword: 'auth/change-password',
+    updateProfile: 'auth/profile'
   },
   users: {
     list: 'users',

@@ -1,9 +1,7 @@
 import { z } from 'zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
-import { cn } from '@/lib/utils'
-import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -15,111 +13,212 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useAuthStore } from '@/stores/authStore'
+import { useUpdateProfile } from './services/profile.services'
+import { toast } from 'sonner'
+import { IconUpload, IconX } from '@tabler/icons-react'
 
 const profileFormSchema = z.object({
-  username: z
+  name: z
     .string()
-    .min(2, {
-      message: 'Username must be at least 2 characters.',
-    })
-    .max(30, {
-      message: 'Username must not be longer than 30 characters.',
-    }),
-  email: z
-    .string({
-      required_error: 'Please select an email to display.',
-    })
-    .email(),
-  bio: z.string().max(160).min(4),
-  urls: z
-    .array(
-      z.object({
-        value: z.string().url({ message: 'Please enter a valid URL.' }),
-      })
-    )
-    .optional(),
+    .min(2, { message: 'Name must be at least 2 characters.' })
+    .max(255, { message: 'Name must not be longer than 255 characters.' }),
+  phone: z.string().max(20, { message: 'Phone must not exceed 20 characters.' }).optional().nullable(),
+  date_of_birth: z.string().optional().nullable(),
+  bio: z.string().max(500, { message: 'Bio must not exceed 500 characters.' }).optional().nullable(),
 })
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-// This can come from your database or API.
-const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
-}
-
 export default function ProfileForm() {
+  const { userInfo, refreshUserInfo } = useAuthStore()
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
-    defaultValues,
-    mode: 'onChange',
+    defaultValues: {
+      name: userInfo?.name || '',
+      phone: userInfo?.phone || '',
+      date_of_birth: userInfo?.date_of_birth || '',
+      bio: userInfo?.bio ? JSON.stringify(userInfo.bio) : '',
+    },
   })
 
-  const { fields, append } = useFieldArray({
-    name: 'urls',
-    control: form.control,
+  // Update form when userInfo changes
+  useEffect(() => {
+    if (userInfo) {
+      form.reset({
+        name: userInfo.name || '',
+        phone: userInfo.phone || '',
+        date_of_birth: userInfo.date_of_birth || '',
+        bio: userInfo.bio ? JSON.stringify(userInfo.bio) : '',
+      })
+    }
+  }, [userInfo, form])
+
+  const { mutate: updateProfile } = useUpdateProfile({
+    onSuccess: () => {
+      setIsLoading(false)
+      toast.success('Profile updated successfully!')
+      refreshUserInfo()
+      setAvatarFile(null)
+      setAvatarPreview(null)
+    },
+    onError: (error: any) => {
+      setIsLoading(false)
+      const errorMsg = error?.response?.data?.message || 'Failed to update profile'
+      toast.error(errorMsg)
+    },
   })
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 2048 * 1024) {
+        toast.error('Avatar size must not exceed 2MB')
+        return
+      }
+      if (!['image/jpeg', 'image/jpg', 'image/png', 'image/gif'].includes(file.type)) {
+        toast.error('Avatar must be an image (jpeg, jpg, png, gif)')
+        return
+      }
+      setAvatarFile(file)
+      setAvatarPreview(URL.createObjectURL(file))
+    }
+  }
+
+  const removeAvatar = () => {
+    setAvatarFile(null)
+    setAvatarPreview(null)
+  }
+
+  const onSubmit = (data: ProfileFormValues) => {
+    setIsLoading(true)
+    
+    const formData = new FormData()
+    formData.append('name', data.name)
+    if (data.phone) formData.append('phone', data.phone)
+    if (data.date_of_birth) formData.append('date_of_birth', data.date_of_birth)
+    if (data.bio) {
+      try {
+        const bioObj = JSON.parse(data.bio)
+        formData.append('bio', JSON.stringify(bioObj))
+      } catch {
+        formData.append('bio', JSON.stringify({ about: data.bio }))
+      }
+    }
+    if (avatarFile) formData.append('avatar', avatarFile)
+
+    updateProfile(formData)
+  }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((data) => showSubmittedData(data))}
-        className='space-y-8'
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
+        {/* Avatar Upload */}
+        <div className='space-y-2'>
+          <FormLabel>Profile Picture</FormLabel>
+          <div className='flex items-start gap-6'>
+            <Avatar className='h-24 w-24 border-2'>
+              <AvatarImage src={avatarPreview || (userInfo as any)?.avatar_url} />
+              <AvatarFallback className='text-lg'>
+                {userInfo?.name?.split(' ').slice(0, 2).map(word => word[0]).join('').toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className='flex-1 space-y-3'>
+              <div className='flex gap-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  onClick={() => document.getElementById('avatar-upload')?.click()}
+                >
+                  <IconUpload className='mr-2 h-4 w-4' />
+                  {avatarFile ? 'Change Photo' : 'Upload Photo'}
+                </Button>
+                {(avatarPreview || (userInfo as any)?.avatar_url) && (
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
+                    onClick={removeAvatar}
+                  >
+                    <IconX className='mr-2 h-4 w-4' />
+                    Remove
+                  </Button>
+                )}
+              </div>
+              <p className='text-muted-foreground text-xs'>
+                JPG, PNG or GIF. Max size 2MB. Recommended size 400x400px.
+              </p>
+              <input
+                id='avatar-upload'
+                type='file'
+                accept='image/*'
+                className='hidden'
+                onChange={handleAvatarChange}
+              />
+            </div>
+          </div>
+        </div>
+
         <FormField
           control={form.control}
-          name='username'
+          name='name'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>Full Name</FormLabel>
               <FormControl>
-                <Input placeholder='shadcn' {...field} />
+                <Input placeholder='Enter your full name' {...field} />
               </FormControl>
               <FormDescription>
-                This is your public display name. It can be your real name or a
-                pseudonym. You can only change this once every 30 days.
+                This is your public display name. It will be visible to other users.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name='email'
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+
+        <div className='grid gap-6 sm:grid-cols-2'>
+          <FormField
+            control={form.control}
+            name='phone'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder='Select a verified email to display' />
-                  </SelectTrigger>
+                  <Input placeholder='+1 (555) 000-0000' {...field} value={field.value || ''} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value='m@example.com'>m@example.com</SelectItem>
-                  <SelectItem value='m@google.com'>m@google.com</SelectItem>
-                  <SelectItem value='m@support.com'>m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{' '}
-                <Link to='/'>email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                <FormDescription>
+                  Optional
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='date_of_birth'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date of Birth</FormLabel>
+                <FormControl>
+                  <Input type='date' {...field} value={field.value || ''} />
+                </FormControl>
+                <FormDescription>
+                  Optional
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
         <FormField
           control={form.control}
           name='bio'
@@ -128,52 +227,33 @@ export default function ProfileForm() {
               <FormLabel>Bio</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='Tell us a little bit about yourself'
-                  className='resize-none'
+                  placeholder='Write a short introduction about yourself...'
+                  className='resize-none min-h-[100px]'
                   {...field}
+                  value={field.value || ''}
                 />
               </FormControl>
               <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
+                Brief description for your profile. Max 500 characters.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && 'sr-only')}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && 'sr-only')}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
+
+        <div className='flex gap-3 pt-4'>
+          <Button type='submit' disabled={isLoading}>
+            {isLoading ? 'Saving...' : 'Save Changes'}
+          </Button>
           <Button
             type='button'
             variant='outline'
-            size='sm'
-            className='mt-2'
-            onClick={() => append({ value: '' })}
+            onClick={() => form.reset()}
+            disabled={isLoading}
           >
-            Add URL
+            Cancel
           </Button>
         </div>
-        <Button type='submit'>Update profile</Button>
       </form>
     </Form>
   )
